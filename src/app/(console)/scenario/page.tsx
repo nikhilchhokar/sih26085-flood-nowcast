@@ -125,22 +125,22 @@ export default function ScenarioPage() {
                     setParams(p.params);
                     setLabel(p.label);
                   }}
-                  className={cx("rounded-md border px-2 py-1 text-[10.5px] font-semibold", label === p.label ? "border-cyan-400/60 bg-cyan-400/10 text-cyan-200" : "border-ink-600 text-slate-300 hover:bg-ink-800")}
+                  className={cx("rounded-md border px-2 py-1 text-xs font-semibold", label === p.label ? "border-accent/40 bg-accent-subtle text-accent" : "border-line-strong text-fg-2 hover:bg-surface-3")}
                 >
                   {p.label}
                 </button>
               ))}
             </div>
             <div className="space-y-3.5">
-              <Slider label="Rainfall intensity" value={params.rainfallIntensity} min={0} max={150} unit=" mm/hr" onChange={(v) => set({ rainfallIntensity: v })} hint="Mean intensity of the design storm (peak ≈ 1.8×)" />
-              <Slider label="Storm duration" value={params.stormDuration} min={15} max={240} step={5} unit=" min" onChange={(v) => set({ stormDuration: v })} />
+              <Slider label="Rainfall intensity" value={params.rainfallIntensity} min={0} max={150} unit="mm/hr" onChange={(v) => set({ rainfallIntensity: v })} hint="Mean intensity of the design storm (peak ≈ 1.8×)" />
+              <Slider label="Storm duration" value={params.stormDuration} min={15} max={240} step={5} unit="min" onChange={(v) => set({ stormDuration: v })} />
               <Slider label="Drainage capacity" value={params.drainageCapacity} min={30} max={150} unit="%" onChange={(v) => set({ drainageCapacity: v })} hint="Effective capacity as % of design (desilting, pumps)" />
               <Slider label="Drain blockage" value={params.blockage} min={0} max={80} unit="%" onChange={(v) => set({ blockage: v })} hint="Additional network-wide blockage; hits already-silted nodes hardest" />
-              <Slider label="Initial water level" value={params.initialWaterLevel} min={0} max={3} step={0.1} unit=" m" format={(v) => v.toFixed(1)} onChange={(v) => set({ initialWaterLevel: v })} hint="Antecedent level in drains before the storm" />
+              <Slider label="Initial water level" value={params.initialWaterLevel} min={0} max={3} step={0.1} unit="m" format={(v) => v.toFixed(1)} onChange={(v) => set({ initialWaterLevel: v })} hint="Antecedent level in drains before the storm" />
               <Slider label="Impervious surface" value={params.impervious ?? 72} min={30} max={98} unit="%" onChange={(v) => set({ impervious: v })} hint="Share of sealed surface — more runoff, faster" />
-              <div className="rounded-lg border border-ink-700 bg-ink-850 px-2.5 py-1.5">
-                <Toggle checked={params.backwater} onChange={(v) => set({ backwater: v })} label={`Tidal / backwater: ${params.backwater ? "ON" : "OFF"}`} hint={ds?.backwater.label} />
-                <p className="text-[10.5px] text-slate-500">{ds?.backwater.label}</p>
+              <div className="rounded border border-line bg-surface-2 px-2.5 py-1.5">
+                <Toggle checked={params.backwater} onChange={(v) => set({ backwater: v })} label={`Tidal / backwater: ${params.backwater ? "ON":"OFF"}`} hint={ds?.backwater.label} />
+                <p className="text-xs text-fg-4">{ds?.backwater.label}</p>
               </div>
             </div>
             <div className="mt-4 flex gap-2">
@@ -165,12 +165,12 @@ export default function ScenarioPage() {
             <div className="mt-2.5">
               <Toggle checked={live} onChange={setLive} label="Live preview after first run" hint="Re-runs the model ~0.4 s after each change" />
             </div>
-            {err && <p className="mt-2 text-xs text-red-300">{err}</p>}
+            {err && <p className="mt-2 text-xs text-danger">{err}</p>}
           </Panel>
         </div>
 
         {/* map */}
-        <div className="relative min-w-0 flex-1 overflow-hidden rounded-xl border border-ink-700">
+        <div className="relative min-w-0 flex-1 overflow-hidden rounded border border-line">
           {ds ? (
             <FloodMap ds={ds} res={resp?.result ?? null} clock={clock} layers={layers} selection={selection} onSelect={select}>
               <LayerPanel defaultOpen={false} />
@@ -179,30 +179,30 @@ export default function ScenarioPage() {
               {resp && <TimeBar />}
               {resp && <DetailPanel ds={ds} res={resp.result} clock={clock} selection={selection} onClose={() => select(null)} onSelect={select} />}
               {!resp && stage < 0 && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-ink-950/35">
-                  <div className="rounded-2xl border border-ink-600 bg-ink-900/95 px-6 py-5 text-center shadow-2xl">
-                    <Sparkles className="mx-auto h-6 w-6 text-cyan-300" />
-                    <p className="mt-2 text-sm font-semibold text-white">Set the storm and drainage conditions, then press Run simulation</p>
-                    <p className="mt-1 text-xs text-slate-400">Try the “Cloudburst” or “Pre-monsoon desilting missed” presets.</p>
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/25">
+                  <div className="rounded border border-line-strong bg-surface px-6 py-5 text-center shadow-float">
+                    <Sparkles className="mx-auto h-6 w-6 text-accent" />
+                    <p className="mt-2 text-sm font-semibold text-fg">Set the storm and drainage conditions, then press Run simulation</p>
+                    <p className="mt-1 text-xs text-fg-3">Try the “Cloudburst” or “Pre-monsoon desilting missed” presets.</p>
                   </div>
                 </div>
               )}
               {stage >= 0 && (
-                <div className="absolute inset-0 z-30 flex items-center justify-center bg-ink-950/55 backdrop-blur-[2px]">
-                  <div className="w-[380px] rounded-2xl border border-cyan-400/30 bg-ink-900/97 p-5 shadow-2xl">
-                    <div className="font-mono text-[10px] font-bold tracking-[0.2em] text-cyan-400 uppercase">Running coupled model</div>
+                <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/25">
+                  <div className="w-[380px] rounded border border-accent/40 bg-surface p-5 shadow-float">
+                    <div className="font-mono text-xs font-semibold text-accent">Running coupled model</div>
                     <div className="mt-3 space-y-2">
                       {STAGES.map((s, i) => (
-                        <div key={s} className={cx("flex items-center gap-2.5 text-sm transition-colors", i < stage ? "text-slate-400" : i === stage ? "text-white" : "text-slate-600")}>
+                        <div key={s} className={cx("flex items-center gap-2.5 text-sm transition-colors", i < stage ? "text-fg-3" : i === stage ? "text-fg" : "text-fg-4")}>
                           <span className="flex h-5 w-5 items-center justify-center">
-                            {i < stage ? <Check className="h-4 w-4 text-emerald-400" /> : i === stage ? <LoaderCircle className="h-4 w-4 animate-spin text-cyan-300" /> : <span className="h-1.5 w-1.5 rounded-full bg-slate-600" />}
+                            {i < stage ? <Check className="h-4 w-4 text-ok" /> : i === stage ? <LoaderCircle className="h-4 w-4 animate-spin text-accent" /> : <span className="h-1.5 w-1.5 rounded-full bg-slate-600" />}
                           </span>
                           {s}
                         </div>
                       ))}
                     </div>
-                    <div className="mt-4 h-1 overflow-hidden rounded-full bg-ink-700">
-                      <div className="h-full bg-cyan-400 transition-all duration-500" style={{ width: `${(Math.min(stage + 1, STAGES.length) / STAGES.length) * 100}%` }} />
+                    <div className="mt-4 h-1 overflow-hidden rounded-full bg-line">
+                      <div className="h-full bg-accent transition-all duration-500" style={{ width: `${(Math.min(stage + 1, STAGES.length) / STAGES.length) * 100}%` }} />
                     </div>
                   </div>
                 </div>
@@ -216,7 +216,7 @@ export default function ScenarioPage() {
         {/* results */}
         <div className="scroll-thin flex w-[360px] shrink-0 flex-col gap-2.5 overflow-y-auto">
           <Panel title="Predicted outcome" sim className="shrink-0" subtitle={resp ? `${label} · engine ${resp.computeMs} ms` : "Run a scenario to see results"}>
-            {resp ? <Outcome s={resp.summary} b={resp.baselineSummary} /> : <p className="text-xs text-slate-500">No run yet.</p>}
+            {resp ? <Outcome s={resp.summary} b={resp.baselineSummary} /> : <p className="text-xs text-fg-4">No run yet.</p>}
             {resp && (
               <div className="mt-3 flex gap-2">
                 <Button
@@ -257,14 +257,14 @@ function Outcome({ s, b }: { s: NowcastSummary; b: NowcastSummary }) {
   return (
     <div className="grid grid-cols-2 gap-2">
       {rows.map((r) => (
-        <div key={r.label} className="rounded-lg border border-ink-700 bg-ink-850 px-2.5 py-2">
-          <div className="text-[9.5px] font-bold tracking-wider text-slate-500 uppercase">{r.label}</div>
-          <div className="mt-0.5 font-mono text-xl font-semibold text-white tnum" style={r.color ? { color: r.color } : undefined}>
+        <div key={r.label} className="rounded border border-line bg-surface-2 px-2.5 py-2">
+          <div className="text-xs font-semibold text-fg-4">{r.label}</div>
+          <div className="mt-0.5 font-mono text-xl font-semibold text-fg tnum" style={r.color ? { color: r.color } : undefined}>
             {r.v}
           </div>
           {r.label !== "Peak flood time" && (
-            <div className={cx("font-mono text-[10px]", r.d > 0 ? "text-red-300" : r.d < 0 ? "text-emerald-300" : "text-slate-500")}>
-              {r.d === 0 ? "= baseline nowcast" : `${r.d > 0 ? "▲" : "▼"} ${r.unit ? Math.abs(r.d).toFixed(2) : Math.abs(Math.round(r.d)).toLocaleString("en-IN")} vs baseline`}
+            <div className={cx("font-mono text-xs", r.d > 0 ? "text-danger" : r.d < 0 ? "text-ok" : "text-fg-4")}>
+              {r.d === 0 ? "= baseline nowcast" : `${r.d > 0 ? "▲":"▼"} ${r.unit ? Math.abs(r.d).toFixed(2) : Math.abs(Math.round(r.d)).toLocaleString("en-IN")} vs baseline`}
             </div>
           )}
         </div>
@@ -286,15 +286,15 @@ function CompareChart({ ds, res, base, clock }: { ds: CityDataset; res: SimResul
       <div className="h-44">
         <ResponsiveContainer>
           <LineChart data={data} margin={{ top: 6, right: 8, left: -20, bottom: 0 }}>
-            <CartesianGrid stroke="#1c2a48" vertical={false} />
+            <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
             <XAxis dataKey="t" type="number" domain={[0, 180]} ticks={[0, 60, 120, 180]} tickFormatter={(v) => clockLabel(NOW_CLOCK + v)} tick={axisTick} axisLine={false} tickLine={false} />
             <YAxis tick={axisTick} axisLine={false} tickLine={false} allowDecimals={false} />
             <Tooltip {...chartTooltip} labelFormatter={(v) => clockLabel(NOW_CLOCK + Number(v))} />
             <RLegend wrapperStyle={{ fontSize: 10 }} />
-            <ReferenceLine x={clock - NOW_CLOCK} stroke="#22d3ee" />
-            <Line dataKey="scenario" name="Scenario" stroke="#f97316" strokeWidth={2.2} dot={false} isAnimationActive={false} />
-            <Line dataKey="baseline" name="Baseline" stroke="#64748b" strokeWidth={1.5} strokeDasharray="4 3" dot={false} isAnimationActive={false} />
-            <Line dataKey="rain" name="Rain mm/hr" stroke="#22d3ee" strokeOpacity={0.6} strokeWidth={1} dot={false} isAnimationActive={false} />
+            <ReferenceLine x={clock - NOW_CLOCK} stroke="var(--chart-rain)" />
+            <Line dataKey="scenario" name="Scenario" stroke="var(--chart-warn)" strokeWidth={2.2} dot={false} isAnimationActive={false} />
+            <Line dataKey="baseline" name="Baseline" stroke="var(--chart-axis)" strokeWidth={1.5} strokeDasharray="4 3" dot={false} isAnimationActive={false} />
+            <Line dataKey="rain" name="Rain mm/hr" stroke="var(--chart-rain)" strokeOpacity={0.6} strokeWidth={1} dot={false} isAnimationActive={false} />
           </LineChart>
         </ResponsiveContainer>
       </div>

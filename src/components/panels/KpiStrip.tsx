@@ -10,7 +10,7 @@ export function KpiStrip({ summary, rain, horizonLabel, actions }: { summary?: N
     return (
       <div className="grid grid-cols-6 gap-2.5">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-[78px] rounded-xl" />
+          <Skeleton key={i} className="h-[78px] rounded" />
         ))}
       </div>
     );
@@ -24,7 +24,7 @@ export function KpiStrip({ summary, rain, horizonLabel, actions }: { summary?: N
         value={summary.roadsAtRisk}
         label="Roads at risk"
         sub={`${summary.sectorsAffected} sectors · ${summary.criticalIntersections} critical junctions`}
-        tone={summary.roadsAtRisk ? "#f97316" : "#22c55e"}
+        tone={summary.roadsAtRisk ? "var(--chart-warn)" : "var(--ok)"}
       />
       <Stat
         question="When?"
@@ -33,7 +33,7 @@ export function KpiStrip({ summary, rain, horizonLabel, actions }: { summary?: N
         unit={summary.firstImpactMin == null ? undefined : "min"}
         label="Time to impact"
         sub={`Peak flooding ${clockLabel(summary.peakClock)}`}
-        tone={summary.firstImpactMin != null && summary.firstImpactMin < 45 ? "#fbbf24" : undefined}
+        tone={summary.firstImpactMin != null && summary.firstImpactMin < 45 ? "var(--warn)" : undefined}
       />
       <Stat
         question="How severe?"
@@ -50,8 +50,8 @@ export function KpiStrip({ summary, rain, horizonLabel, actions }: { summary?: N
         value={rain ? Math.round(rain.current) : "—"}
         unit="mm/hr"
         label="Current rainfall"
-        sub={rain ? `${rain.accumulated} mm since 06:00 · ${rain.trend30 >= 0 ? "▲" : "▼"} ${Math.abs(rain.trend30)} in 30 min` : ""}
-        tone="#22d3ee"
+        sub={rain ? `${rain.accumulated} mm since 06:00 · ${rain.trend30 >= 0 ? "▲":"▼"} ${Math.abs(rain.trend30)} in 30 min` : ""}
+        tone="var(--chart-rain)"
       />
       <Stat
         icon={<Users className="h-3.5 w-3.5" />}
@@ -59,7 +59,7 @@ export function KpiStrip({ summary, rain, horizonLabel, actions }: { summary?: N
         value={summary.affectedPopulation.toLocaleString("en-IN")}
         label="People affected"
         sub={`${summary.hospitalsAtRisk} hospital access at risk${actions ? ` · ${actions} actions` : ""}`}
-        tone={summary.affectedPopulation ? "#fda4af" : undefined}
+        tone={summary.affectedPopulation ? "var(--danger)" : undefined}
       />
       <Stat
         icon={<Gauge className="h-3.5 w-3.5" />}

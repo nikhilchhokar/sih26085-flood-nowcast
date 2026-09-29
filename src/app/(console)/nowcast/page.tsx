@@ -77,7 +77,7 @@ export default function NowcastPage() {
         }
       />
       <div className="flex min-h-0 flex-1 gap-2.5">
-        <div className="relative min-w-0 flex-1 overflow-hidden rounded-xl border border-ink-700">
+        <div className="relative min-w-0 flex-1 overflow-hidden rounded border border-line">
           {ds ? (
             <FloodMap ds={ds} res={now?.result} clock={clock} layers={layers} selection={selection} onSelect={select} focus={focus}>
               <LayerPanel />
@@ -101,23 +101,23 @@ export default function NowcastPage() {
                     key={f.t}
                     type="button"
                     onClick={() => tween(f.t)}
-                    className={cx("w-full rounded-lg border px-2.5 py-2 text-left transition-colors", active ? "border-cyan-400/60 bg-cyan-400/10" : "border-ink-700 bg-ink-850 hover:border-ink-500")}
+                    className={cx("w-full rounded border px-2.5 py-2 text-left transition-colors", active ? "border-accent/40 bg-accent-subtle" : "border-line bg-surface-2 hover:border-line-strong")}
                   >
                     <div className="flex items-center gap-2">
-                      <span className={cx("w-12 font-mono text-xs font-bold", active ? "text-cyan-200" : "text-slate-300")}>{f.t === 0 ? "NOW" : `+${f.t}`}</span>
-                      <span className="font-mono text-[10px] text-slate-500">{clockLabel(NOW_CLOCK + f.t)}</span>
-                      <span className="ml-auto text-[11.5px] text-slate-200">{f.text}</span>
+                      <span className={cx("w-12 font-mono text-xs font-semibold", active ? "text-accent" : "text-fg-2")}>{f.t === 0 ? "NOW" : `+${f.t}`}</span>
+                      <span className="font-mono text-xs text-fg-4">{clockLabel(NOW_CLOCK + f.t)}</span>
+                      <span className="ml-auto text-xs text-fg">{f.text}</span>
                     </div>
-                    <div className="mt-1.5 flex h-1.5 overflow-hidden rounded-full bg-ink-700">
+                    <div className="mt-1.5 flex h-1.5 overflow-hidden rounded-full bg-line">
                       {RISK_ORDER.filter((r) => r !== "safe").map((r) => (
                         <div key={r} style={{ width: `${(f.c[r] / total) * 100 * 4}%`, background: RISK_COLOR[r] }} />
                       ))}
                     </div>
-                    <div className="mt-1 flex gap-2.5 font-mono text-[10px] text-slate-500">
+                    <div className="mt-1 flex gap-2.5 font-mono text-xs text-fg-4">
                       <span style={{ color: RISK_COLOR.low }}>L {f.c.low}</span>
                       <span style={{ color: RISK_COLOR.moderate }}>M {f.c.moderate}</span>
                       <span style={{ color: RISK_COLOR.high }}>H {f.c.high}</span>
-                      <span className="text-red-300">C {f.c.critical}</span>
+                      <span className="text-danger">C {f.c.critical}</span>
                     </div>
                   </button>
                 );
@@ -125,10 +125,10 @@ export default function NowcastPage() {
             </div>
           </Panel>
 
-          <Panel title={`Roads at risk · ${clockLabel(bucket)}`} sim className="shrink-0" bodyClassName="p-0" right={riskLoading ? <span className="text-[10px] text-slate-500">updating…</span> : null}>
+          <Panel title={`Roads at risk · ${clockLabel(bucket)}`} sim className="shrink-0" bodyClassName="p-0" right={riskLoading ? <span className="text-xs text-fg-4">updating…</span> : null}>
             <table className="w-full text-xs">
               <thead>
-                <tr className="text-left text-[9.5px] tracking-wider text-slate-500 uppercase">
+                <tr className="text-left text-xs text-fg-4">
                   <th className="px-3 py-1.5 font-semibold">Road</th>
                   <th className="px-1 py-1.5 font-semibold">Depth</th>
                   <th className="px-1 py-1.5 font-semibold">Onset</th>
@@ -137,21 +137,21 @@ export default function NowcastPage() {
               </thead>
               <tbody>
                 {(risk?.roads ?? []).slice(0, 10).map((r) => (
-                  <tr key={r.id} onClick={() => select({ kind: "road", id: r.id })} className="cursor-pointer border-t border-ink-700/60 hover:bg-ink-800">
+                  <tr key={r.id} onClick={() => select({ kind: "road", id: r.id })} className="cursor-pointer border-t border-line hover:bg-surface-3">
                     <td className="max-w-[150px] px-3 py-1.5">
-                      <div className="truncate text-slate-200">{r.label}</div>
-                      <div className="font-mono text-[10px] text-slate-500">{r.id}</div>
+                      <div className="truncate text-fg">{r.label}</div>
+                      <div className="font-mono text-xs text-fg-4">{r.id}</div>
                     </td>
                     <td className="px-1 py-1.5 font-mono" style={{ color: RISK_TEXT[r.risk] }}>
                       {r.depth.toFixed(2)}
                     </td>
-                    <td className="px-1 py-1.5 font-mono text-slate-400">{r.onsetMin == null ? "—" : r.onsetMin <= 0 ? "now" : `${r.onsetMin}m`}</td>
-                    <td className="px-3 py-1.5 text-right font-mono text-slate-300">{Math.round(r.probability * 100)}%</td>
+                    <td className="px-1 py-1.5 font-mono text-fg-3">{r.onsetMin == null ? "—" : r.onsetMin <= 0 ? "now" : `${r.onsetMin}m`}</td>
+                    <td className="px-3 py-1.5 text-right font-mono text-fg-2">{Math.round(r.probability * 100)}%</td>
                   </tr>
                 ))}
                 {risk && !risk.roads.length && (
                   <tr>
-                    <td colSpan={4} className="px-3 py-4 text-center text-slate-500">
+                    <td colSpan={4} className="px-3 py-4 text-center text-fg-4">
                       No roads above 0.1 m.
                     </td>
                   </tr>
@@ -166,22 +166,22 @@ export default function NowcastPage() {
                 {(risk?.sectors ?? []).map((s) => {
                   const sec = ds?.sectors.find((x) => x.id === s.id);
                   return (
-                    <tr key={s.id} onClick={() => select({ kind: "sector", id: s.id })} className="cursor-pointer border-t border-ink-700/60 first:border-t-0 hover:bg-ink-800">
+                    <tr key={s.id} onClick={() => select({ kind: "sector", id: s.id })} className="cursor-pointer border-t border-line first:border-t-0 hover:bg-surface-3">
                       <td className="px-3 py-1.5">
-                        <div className="text-slate-200">{sec?.name}</div>
-                        <div className="truncate text-[10px] text-slate-500">{sec?.locality}</div>
+                        <div className="text-fg">{sec?.name}</div>
+                        <div className="truncate text-xs text-fg-4">{sec?.locality}</div>
                       </td>
                       <td className="px-1 py-1.5">
                         <RiskBadge level={s.risk} size="xs" />
                       </td>
-                      <td className="px-1 py-1.5 text-right font-mono text-slate-300">{s.roadsUnsafe} rds</td>
-                      <td className="px-3 py-1.5 text-right font-mono text-slate-300">{s.popAtRisk.toLocaleString("en-IN")}</td>
+                      <td className="px-1 py-1.5 text-right font-mono text-fg-2">{s.roadsUnsafe} rds</td>
+                      <td className="px-3 py-1.5 text-right font-mono text-fg-2">{s.popAtRisk.toLocaleString("en-IN")}</td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
-            <p className="border-t border-ink-700/60 px-3 py-1.5 text-[10px] text-slate-500">Columns: unsafe roads · people affected (≥ 0.15 m at doorstep)</p>
+            <p className="border-t border-line px-3 py-1.5 text-xs text-fg-4">Columns: unsafe roads · people affected (≥ 0.15 m at doorstep)</p>
           </Panel>
         </div>
       </div>

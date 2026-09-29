@@ -98,7 +98,7 @@ export default function EvacuationPage() {
   }, [ds, now, sector, clock]);
 
   const layers = { ...DEFAULT_LAYERS, drainage: false, rain: false, routes: true, shelters: true, infra: true, risk: true, depth: true };
-  const evacLines = routes.filter((r) => r.opt && r !== best).map((r) => ({ coords: r.opt!.coords, color: "#64748b" }));
+  const evacLines = routes.filter((r) => r.opt && r !== best).map((r) => ({ coords: r.opt!.coords, color: "var(--chart-axis)" }));
 
   if (error) return <ErrorState error={error} />;
   return (
@@ -124,14 +124,14 @@ export default function EvacuationPage() {
         }
       />
       <div className="grid grid-cols-5 gap-2.5">
-        <Stat icon={<Users className="h-3.5 w-3.5" />} value={popRisk.toLocaleString("en-IN")} label="Population at risk" sub={`${sector?.name ?? ""} at peak ${clockLabel(clock)}`} tone={popRisk ? "#fb7185" : "#4ade80"} />
-        <Stat icon={<Tent className="h-3.5 w-3.5" />} value={bestShelter?.id ?? "—"} label="Nearest safe shelter" sub={bestShelter ? `${bestShelter.name} · cap ${bestShelter.capacity}` : "computing…"} tone="#34d399" />
-        <Stat icon={<Bus className="h-3.5 w-3.5" />} value={evacMin == null ? "—" : evacMin >= 60 ? `${Math.floor(evacMin / 60)}h ${evacMin % 60}m` : `${evacMin} min`} label="Est. evacuation time" sub={`${FLEET} buses × ${BUS_SEATS} seats · ${trips} trip${trips === 1 ? "" : "s"}`} />
+        <Stat icon={<Users className="h-3.5 w-3.5" />} value={popRisk.toLocaleString("en-IN")} label="Population at risk" sub={`${sector?.name ?? ""} at peak ${clockLabel(clock)}`} tone={popRisk ? "var(--danger)" : "var(--ok)"} />
+        <Stat icon={<Tent className="h-3.5 w-3.5" />} value={bestShelter?.id ?? "—"} label="Nearest safe shelter" sub={bestShelter ? `${bestShelter.name} · cap ${bestShelter.capacity}` : "computing…"} tone="var(--ok)" />
+        <Stat icon={<Bus className="h-3.5 w-3.5" />} value={evacMin == null ? "—" : evacMin >= 60 ? `${Math.floor(evacMin / 60)}h ${evacMin % 60}m` : `${evacMin} min`} label="Est. evacuation time" sub={`${FLEET} buses × ${BUS_SEATS} seats · ${trips} trip${trips === 1 ? "":"s"}`} />
         <Stat value={best?.opt ? best.opt.distanceKm : "—"} unit="km" label="Safe route distance" sub={best?.opt ? `ETA ${best.opt.etaMin} min · max depth ${best.opt.maxDepth.toFixed(2)} m` : ""} />
-        <Stat icon={<TriangleAlert className="h-3.5 w-3.5" />} value={avoid.length} label="Roads to avoid" sub={`Unsafe in ${sector?.name ?? "sector"} at peak`} tone={avoid.length ? "#f97316" : undefined} />
+        <Stat icon={<TriangleAlert className="h-3.5 w-3.5" />} value={avoid.length} label="Roads to avoid" sub={`Unsafe in ${sector?.name ?? "sector"} at peak`} tone={avoid.length ? "var(--chart-warn)" : undefined} />
       </div>
       <div className="flex min-h-0 flex-1 gap-2.5">
-        <div className="relative min-w-0 flex-1 overflow-hidden rounded-xl border border-ink-700">
+        <div className="relative min-w-0 flex-1 overflow-hidden rounded border border-line">
           {ds ? (
             <FloodMap
               ds={ds}
@@ -152,11 +152,11 @@ export default function EvacuationPage() {
               <Legend />
               <DetailPanel ds={ds} res={now?.result} clock={clock} selection={selection} onClose={() => select(null)} onSelect={select} />
               {loading && (
-                <div className="absolute top-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-lg border border-ink-600 bg-ink-900/95 px-3 py-1.5 text-xs text-slate-300">
-                  <LoaderCircle className="h-3.5 w-3.5 animate-spin text-cyan-300" /> Routing evacuation corridors…
+                <div className="absolute top-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded border border-line-strong bg-surface px-3 py-1.5 text-xs text-fg-2">
+                  <LoaderCircle className="h-3.5 w-3.5 animate-spin text-accent" /> Routing evacuation corridors…
                 </div>
               )}
-              <div className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-lg border border-ink-600 bg-ink-900/92 px-3 py-1.5 text-[11px] text-slate-300 shadow-xl">
+              <div className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded border border-line-strong bg-surface px-3 py-1.5 text-xs text-fg-2 shadow-float">
                 Showing forecast peak for {sector?.name} · {clockLabel(clock)} · green = safe corridor · grey dashed = alternates
               </div>
             </FloodMap>
@@ -170,35 +170,35 @@ export default function EvacuationPage() {
             <KV k="Flooded area at peak" v={`${impact?.floodedAreaPct.toFixed(1) ?? 0}%`} />
             <KV k="Max street depth" v={<span style={{ color: RISK_TEXT[riskOf(impact?.maxDepth ?? 0)] }}>{impact?.maxDepth.toFixed(2)} m</span>} />
             <KV k="Shelter demand vs capacity" v={bestShelter ? `${popRisk.toLocaleString("en-IN")} / ${bestShelter.capacity}` : "—"} />
-            {bestShelter && <Meter value={Math.min(1, popRisk / Math.max(1, bestShelter.capacity ?? 1))} color={popRisk > (bestShelter.capacity ?? 0) ? "#f97316" : "#34d399"} className="mt-1" />}
-            {bestShelter && popRisk > (bestShelter.capacity ?? 0) && <p className="mt-1 text-[11px] text-amber-300">Demand exceeds {bestShelter.id} capacity — open alternates below.</p>}
-            <p className="mt-2 text-[10.5px] text-slate-500">
+            {bestShelter && <Meter value={Math.min(1, popRisk / Math.max(1, bestShelter.capacity ?? 1))} color={popRisk > (bestShelter.capacity ?? 0) ? "var(--chart-warn)" : "var(--ok)"} className="mt-1" />}
+            {bestShelter && popRisk > (bestShelter.capacity ?? 0) && <p className="mt-1 text-xs text-warn">Demand exceeds {bestShelter.id} capacity — open alternates below.</p>}
+            <p className="mt-2 text-xs text-fg-4">
               Evacuation time = trips × (2 × route ETA + {LOAD_MIN} min loading). Assumes {FLEET} buses; refine with actual fleet data.
             </p>
           </Panel>
           <Panel title="Roads to avoid" icon={<TriangleAlert className="h-3.5 w-3.5" />} className="shrink-0" bodyClassName="p-1.5">
             {avoid.length ? (
               avoid.slice(0, 8).map(({ r, d }) => (
-                <button key={r.id} type="button" onClick={() => select({ kind: "road", id: r.id })} className="flex w-full items-center justify-between gap-2 rounded px-2 py-1 text-left text-xs hover:bg-ink-800">
-                  <span className="truncate text-slate-200">{r.label}</span>
+                <button key={r.id} type="button" onClick={() => select({ kind: "road", id: r.id })} className="flex w-full items-center justify-between gap-2 rounded px-2 py-1 text-left text-xs hover:bg-surface-3">
+                  <span className="truncate text-fg">{r.label}</span>
                   <span className="font-mono" style={{ color: RISK_TEXT[riskOf(d)] }}>
                     {d.toFixed(2)} m
                   </span>
                 </button>
               ))
             ) : (
-              <p className="px-2 py-2 text-xs text-slate-500">No blocked roads in this sector at peak.</p>
+              <p className="px-2 py-2 text-xs text-fg-4">No blocked roads in this sector at peak.</p>
             )}
           </Panel>
           <Panel title="Shelters" icon={<Tent className="h-3.5 w-3.5" />} sim className="shrink-0" bodyClassName="p-0">
             {shelters.map(({ p, access, safe, d }) => {
               const r = routes.find((x) => x.shelterId === p.id);
               return (
-                <button key={p.id} type="button" onClick={() => select({ kind: "poi", id: p.id })} className={cx("flex w-full items-center gap-2 border-t border-ink-700/60 px-3 py-1.5 text-left first:border-t-0 hover:bg-ink-800", best?.shelterId === p.id && "bg-emerald-500/10")}>
-                  <span className="w-10 font-mono text-xs text-emerald-300">{p.id}</span>
+                <button key={p.id} type="button" onClick={() => select({ kind: "poi", id: p.id })} className={cx("flex w-full items-center gap-2 border-t border-line px-3 py-1.5 text-left first:border-t-0 hover:bg-surface-3", best?.shelterId === p.id && "bg-ok-subtle")}>
+                  <span className="w-10 font-mono text-xs text-ok">{p.id}</span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-xs text-slate-200">{p.name}</span>
-                    <span className="text-[10px] text-slate-500">
+                    <span className="block truncate text-xs text-fg">{p.name}</span>
+                    <span className="text-xs text-fg-4">
                       cap {p.capacity} · {(d / 1000).toFixed(1)} km{r?.opt ? ` · route ${r.opt.distanceKm} km` : ""}
                     </span>
                   </span>

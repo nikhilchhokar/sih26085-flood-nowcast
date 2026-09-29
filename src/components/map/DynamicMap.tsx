@@ -8,7 +8,7 @@ const Inner = dynamic(() => import("./FloodMap"), {
   ssr: false,
   loading: () => (
     <div className="flex h-full w-full items-center justify-center bg-[#dfe5ea]">
-      <Loading label="Initialising GIS engine…" className="text-slate-600" />
+      <Loading label="Initialising GIS engine…" className="text-fg-4" />
     </div>
   ),
 });

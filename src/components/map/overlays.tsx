@@ -1,22 +1,24 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Box, Crosshair, Expand, Layers, Minus, Pause, Play, Plus, RotateCcw, Shrink, SkipBack } from "lucide-react";
+import { Box, ChevronDown, ChevronUp, Crosshair, Expand, Layers, Minus, Pause, Play, Plus, RotateCcw, Shrink, SkipBack } from "lucide-react";
 import { useApp, type LayerKey } from "@/lib/store";
 import { HORIZON_MIN, NOW_CLOCK, RISK_COLOR, RISK_LABEL, RISK_ORDER, RISK_RANGE, clockLabel, confidenceAt } from "@/lib/engine/constants";
 import { RAIN_STOPS } from "@/lib/engine/rain";
 import { cx } from "../ui/primitives";
 import { useMapCtx } from "./mapContext";
 
+const floatCard = "rounded border border-line bg-surface shadow-float";
+
 /* ------------------------------ Layer panel ------------------------------ */
 export const MAIN_LAYERS: { key: LayerKey; label: string; color: string; hint: string }[] = [
-  { key: "risk", label: "Flood Risk", color: "#f97316", hint: "Sector risk polygons + critical intersections" },
-  { key: "depth", label: "Predicted Depth", color: "#dc2626", hint: "Street-level predicted water depth raster" },
-  { key: "rain", label: "Rainfall", color: "#22d3ee", hint: "Radar-style rainfall intensity (simulated)" },
-  { key: "drainage", label: "Drainage", color: "#2563eb", hint: "Stormwater pipes & nodes, coloured by utilisation" },
+  { key: "risk", label: "Flood risk", color: "#f97316", hint: "Sector risk polygons and critical intersections" },
+  { key: "depth", label: "Predicted depth", color: "#dc2626", hint: "Street-level predicted water depth" },
+  { key: "rain", label: "Rainfall", color: "#0891b2", hint: "Radar-style rainfall intensity (simulated)" },
+  { key: "drainage", label: "Drainage", color: "#1d4ed8", hint: "Stormwater pipes and nodes, coloured by utilisation" },
   { key: "roads", label: "Roads", color: "#16a34a", hint: "Road segments coloured by predicted risk" },
-  { key: "infra", label: "Critical Infrastructure", color: "#e11d48", hint: "Hospitals, fire & police stations" },
-  { key: "routes", label: "Emergency Routes", color: "#0891b2", hint: "Safe routes, vehicles, incidents" },
-  { key: "shelters", label: "Evacuation Centers", color: "#047857", hint: "Designated relief shelters (demo designation)" },
+  { key: "infra", label: "Critical infrastructure", color: "#b91c1c", hint: "Hospitals, fire and police stations" },
+  { key: "routes", label: "Emergency routes", color: "#0f766e", hint: "Safe routes, vehicles, incidents" },
+  { key: "shelters", label: "Evacuation centres", color: "#047857", hint: "Designated relief shelters (demo designation)" },
 ];
 
 export function LayerPanel({ extra, defaultOpen = true, className }: { extra?: { key: LayerKey; label: string; color: string; hint: string }[]; defaultOpen?: boolean; className?: string }) {
@@ -25,19 +27,19 @@ export function LayerPanel({ extra, defaultOpen = true, className }: { extra?: {
   const [open, setOpen] = useState(defaultOpen);
   const items = extra ?? MAIN_LAYERS;
   return (
-    <div className={cx("absolute top-3 left-3 z-10 w-52 rounded-lg border border-ink-600 bg-ink-900/92 shadow-xl backdrop-blur", className)}>
+    <div className={cx("absolute top-3 left-3 z-10 w-52", floatCard, className)}>
       <button type="button" onClick={() => setOpen(!open)} className="flex w-full items-center gap-2 px-3 py-2 text-left">
-        <Layers className="h-3.5 w-3.5 text-cyan-300" />
-        <span className="flex-1 text-[10px] font-bold tracking-[0.12em] text-slate-300 uppercase">Map Layers</span>
-        <span className="text-[10px] text-slate-500">{open ? "hide" : "show"}</span>
+        <Layers className="h-4 w-4 text-fg-3" strokeWidth={1.75} />
+        <span className="flex-1 text-[13px] font-medium text-fg">Layers</span>
+        {open ? <ChevronUp className="h-4 w-4 text-fg-4" /> : <ChevronDown className="h-4 w-4 text-fg-4" />}
       </button>
       {open && (
-        <div className="space-y-0.5 border-t border-ink-700 px-2.5 py-2">
+        <div className="border-t border-line px-1.5 py-1.5">
           {items.map((l) => (
-            <label key={l.key} title={l.hint} className="flex cursor-pointer items-center gap-2 rounded px-1 py-1 hover:bg-ink-800">
-              <input type="checkbox" checked={layers[l.key]} onChange={(e) => setLayer(l.key, e.target.checked)} className="h-3.5 w-3.5 accent-cyan-400" />
-              <span className="h-2 w-2 rounded-sm" style={{ background: l.color }} />
-              <span className="text-xs text-slate-200">{l.label}</span>
+            <label key={l.key} title={l.hint} className="flex cursor-pointer items-center gap-2 rounded-sm px-1.5 py-1 hover:bg-surface-3">
+              <input type="checkbox" checked={layers[l.key]} onChange={(e) => setLayer(l.key, e.target.checked)} className="h-3.5 w-3.5 accent-[var(--accent)]" />
+              <span className="h-2.5 w-2.5 rounded-sm" style={{ background: l.color }} />
+              <span className="text-[13px] text-fg-2">{l.label}</span>
             </label>
           ))}
         </div>
@@ -50,26 +52,27 @@ export function LayerPanel({ extra, defaultOpen = true, className }: { extra?: {
 export function Legend({ showRain, showDrain, className }: { showRain?: boolean; showDrain?: boolean; className?: string }) {
   const [open, setOpen] = useState(true);
   return (
-    <div className={cx("absolute bottom-24 left-3 z-10 rounded-lg border border-ink-600 bg-ink-900/92 px-3 py-2 shadow-xl backdrop-blur", className)}>
-      <button type="button" onClick={() => setOpen(!open)} className="flex w-full items-center justify-between gap-4 text-[10px] font-bold tracking-[0.12em] text-slate-400 uppercase">
-        Legend <span className="font-normal text-slate-600">{open ? "–" : "+"}</span>
+    <div className={cx("absolute bottom-24 left-3 z-10 w-52 px-3 py-2", floatCard, className)}>
+      <button type="button" onClick={() => setOpen(!open)} className="flex w-full items-center justify-between text-[13px] font-medium text-fg">
+        Flood risk (water depth)
+        {open ? <ChevronDown className="h-4 w-4 text-fg-4" /> : <ChevronUp className="h-4 w-4 text-fg-4" />}
       </button>
       {open && (
         <div className="mt-1.5 space-y-2">
           <div className="space-y-1">
             {RISK_ORDER.map((r) => (
-              <div key={r} className="flex items-center gap-2 text-[11px]">
-                <span className="h-2 w-5 rounded-sm" style={{ background: RISK_COLOR[r] }} />
-                <span className="w-16 font-semibold text-slate-200 uppercase">{RISK_LABEL[r]}</span>
-                <span className="font-mono text-[10px] text-slate-500">{RISK_RANGE[r]}</span>
+              <div key={r} className="flex items-center gap-2 text-xs">
+                <span className="h-2 w-4 rounded-sm" style={{ background: RISK_COLOR[r] }} />
+                <span className="w-16 text-fg-2">{RISK_LABEL[r]}</span>
+                <span className="text-fg-4 tnum">{RISK_RANGE[r]}</span>
               </div>
             ))}
           </div>
           {showRain && (
             <div>
-              <div className="mb-1 text-[9px] font-bold tracking-wider text-slate-500 uppercase">Rainfall mm/hr</div>
-              <div className="h-2 w-40 rounded-sm" style={{ background: `linear-gradient(90deg, ${RAIN_STOPS.map(([, c]) => `rgba(${c[0]},${c[1]},${c[2]},${Math.max(0.35, c[3] / 255)})`).join(",")})` }} />
-              <div className="flex w-40 justify-between font-mono text-[9px] text-slate-500">
+              <div className="mb-1 text-xs text-fg-3">Rainfall (mm/hr)</div>
+              <div className="h-2 w-full rounded-sm" style={{ background: `linear-gradient(90deg, ${RAIN_STOPS.map(([, c]) => `rgba(${c[0]},${c[1]},${c[2]},${Math.max(0.35, c[3] / 255)})`).join(",")})` }} />
+              <div className="flex justify-between text-[11px] text-fg-4 tnum">
                 <span>5</span>
                 <span>30</span>
                 <span>70</span>
@@ -79,20 +82,20 @@ export function Legend({ showRain, showDrain, className }: { showRain?: boolean;
           )}
           {showDrain && (
             <div>
-              <div className="mb-1 text-[9px] font-bold tracking-wider text-slate-500 uppercase">Drain utilisation</div>
-              <div className="h-2 w-40 rounded-sm" style={{ background: "linear-gradient(90deg,#1e40af,#2563eb 50%,#eab308 75%,#f97316 90%,#dc2626)" }} />
-              <div className="flex w-40 justify-between font-mono text-[9px] text-slate-500">
+              <div className="mb-1 text-xs text-fg-3">Drain capacity used</div>
+              <div className="h-2 w-full rounded-sm" style={{ background: "linear-gradient(90deg,#1e40af,#2563eb 50%,#eab308 75%,#f97316 90%,#dc2626)" }} />
+              <div className="flex justify-between text-[11px] text-fg-4 tnum">
                 <span>0%</span>
                 <span>75%</span>
                 <span>90%</span>
                 <span>100%</span>
               </div>
-              <div className="mt-1 flex items-center gap-3 text-[10px] text-slate-400">
+              <div className="mt-1 flex items-center gap-3 text-[11px] text-fg-3">
                 <span className="flex items-center gap-1">
                   <span className="h-2.5 w-2.5 rounded-full border-2 border-amber-600" /> Blocked
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="h-2.5 w-2.5 rounded-full bg-red-500/60 ring-2 ring-red-400/50" /> Surcharge
+                  <span className="h-2.5 w-2.5 rounded-full border-2 border-red-500 bg-red-500/40" /> Surcharge
                 </span>
               </div>
             </div>
@@ -112,18 +115,18 @@ export function MapToolbar({ className, hotspot }: { className?: string; hotspot
     document.addEventListener("fullscreenchange", on);
     return () => document.removeEventListener("fullscreenchange", on);
   }, []);
-  const btn = "flex h-8 w-8 items-center justify-center text-slate-300 hover:bg-ink-700 hover:text-white";
+  const btn = "flex h-8 w-8 items-center justify-center text-fg-2 hover:bg-surface-3 hover:text-fg";
   return (
-    <div className={cx("absolute top-3 right-3 z-10 flex flex-col overflow-hidden rounded-lg border border-ink-600 bg-ink-900/92 shadow-xl backdrop-blur", className)}>
+    <div className={cx("absolute top-3 right-3 z-10 flex flex-col overflow-hidden", floatCard, className)}>
       <button type="button" className={btn} title="Zoom in" onClick={() => map?.zoomIn()}>
-        <Plus className="h-4 w-4" />
+        <Plus className="h-4 w-4" strokeWidth={1.75} />
       </button>
-      <button type="button" className={cx(btn, "border-t border-ink-700")} title="Zoom out" onClick={() => map?.zoomOut()}>
-        <Minus className="h-4 w-4" />
+      <button type="button" className={cx(btn, "border-t border-line")} title="Zoom out" onClick={() => map?.zoomOut()}>
+        <Minus className="h-4 w-4" strokeWidth={1.75} />
       </button>
       <button
         type="button"
-        className={cx(btn, "border-t border-ink-700")}
+        className={cx(btn, "border-t border-line")}
         title="Locate hotspot"
         onClick={() => {
           if (!map || !ds) return;
@@ -132,17 +135,17 @@ export function MapToolbar({ className, hotspot }: { className?: string; hotspot
           map.flyTo({ center: c, zoom: 15.4, duration: 1200 });
         }}
       >
-        <Crosshair className="h-4 w-4" />
+        <Crosshair className="h-4 w-4" strokeWidth={1.75} />
       </button>
-      <button type="button" className={cx(btn, "border-t border-ink-700")} title="Reset view" onClick={() => ds && map?.fitBounds(ds.bbox, { padding: 24, pitch: 0, bearing: 0, duration: 900 })}>
-        <RotateCcw className="h-4 w-4" />
+      <button type="button" className={cx(btn, "border-t border-line")} title="Reset view" onClick={() => ds && map?.fitBounds(ds.bbox, { padding: 24, pitch: 0, bearing: 0, duration: 900 })}>
+        <RotateCcw className="h-4 w-4" strokeWidth={1.75} />
       </button>
-      <button type="button" className={cx(btn, "border-t border-ink-700")} title="Tilt 3D" onClick={() => map?.easeTo({ pitch: map.getPitch() > 5 ? 0 : 50, duration: 800 })}>
-        <Box className="h-4 w-4" />
+      <button type="button" className={cx(btn, "border-t border-line")} title="Tilt 3D" onClick={() => map?.easeTo({ pitch: map.getPitch() > 5 ? 0 : 50, duration: 800 })}>
+        <Box className="h-4 w-4" strokeWidth={1.75} />
       </button>
       <button
         type="button"
-        className={cx(btn, "border-t border-ink-700")}
+        className={cx(btn, "border-t border-line")}
         title={fs ? "Exit fullscreen" : "Fullscreen"}
         onClick={() => {
           const el = map?.getContainer().parentElement;
@@ -151,7 +154,7 @@ export function MapToolbar({ className, hotspot }: { className?: string; hotspot
           else el.requestFullscreen?.();
         }}
       >
-        {fs ? <Shrink className="h-4 w-4" /> : <Expand className="h-4 w-4" />}
+        {fs ? <Shrink className="h-4 w-4" strokeWidth={1.75} /> : <Expand className="h-4 w-4" strokeWidth={1.75} />}
       </button>
     </div>
   );
@@ -209,7 +212,7 @@ export function TimeBar({ className, compact, degraded, min = 0 }: { className?:
   const observed = tau < 0;
   const conf = confidenceAt(Math.max(0, tau), degraded);
   return (
-    <div className={cx("absolute right-3 bottom-3 left-3 z-10 rounded-xl border border-ink-600 bg-ink-900/94 px-3 py-2 shadow-2xl backdrop-blur", className)}>
+    <div className={cx("absolute right-3 bottom-3 left-3 z-10 px-3 py-2", floatCard, className)}>
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -218,20 +221,18 @@ export function TimeBar({ className, compact, degraded, min = 0 }: { className?:
             if (!playing && tau >= HORIZON_MIN - 1) setTau(min);
             setPlaying(!playing);
           }}
-          className={cx("flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-xs font-bold tracking-wide uppercase disabled:opacity-40", playing ? "bg-amber-400 text-ink-950" : "bg-cyan-400 text-ink-950 hover:bg-cyan-300")}
+          className="flex h-8 shrink-0 items-center gap-1.5 rounded bg-accent px-3 text-[13px] font-medium text-white hover:bg-accent-hover disabled:opacity-40"
           title="Play the 3-hour nowcast"
         >
-          {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-          {compact ? "" : playing ? "Pause" : "Play Nowcast"}
+          {playing ? <Pause className="h-3.5 w-3.5 fill-current" /> : <Play className="h-3.5 w-3.5 fill-current" />}
+          {compact ? "" : playing ? "Pause" : "Play"}
         </button>
-        <button type="button" disabled={demoActive} onClick={() => (setPlaying(false), tween(0))} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-ink-600 text-slate-300 hover:bg-ink-800 disabled:opacity-40" title="Back to NOW">
-          <SkipBack className="h-4 w-4" />
+        <button type="button" disabled={demoActive} onClick={() => (setPlaying(false), tween(0))} className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-line-strong text-fg-2 hover:bg-surface-3 disabled:opacity-40" title="Back to now">
+          <SkipBack className="h-3.5 w-3.5" />
         </button>
         <div className="w-24 shrink-0 leading-tight">
-          <div className="font-mono text-lg font-semibold text-white tnum">{clockLabel(clock)}</div>
-          <div className={cx("text-[10px] font-bold tracking-wider uppercase", observed ? "text-slate-400" : tau < 1 ? "text-emerald-400" : "text-cyan-300")}>
-            {observed ? `Observed ${Math.round(tau)} min` : tau < 1 ? "Now" : `Forecast T+${Math.round(tau)}`}
-          </div>
+          <div className="text-lg font-semibold text-fg tnum">{clockLabel(clock)}</div>
+          <div className={cx("text-xs", observed ? "text-fg-3" : tau < 1 ? "text-ok" : "text-accent")}>{observed ? `Observed (${Math.round(tau)} min)` : tau < 1 ? "Now" : `Forecast +${Math.round(tau)} min`}</div>
         </div>
         <div className="relative min-w-0 flex-1 pt-1">
           <input
@@ -255,21 +256,18 @@ export function TimeBar({ className, compact, degraded, min = 0 }: { className?:
                 type="button"
                 disabled={demoActive}
                 onClick={() => (setPlaying(false), tween(t))}
-                className={cx(
-                  "absolute -translate-x-1/2 rounded px-1.5 py-0.5 font-mono text-[10px] font-semibold transition-colors",
-                  Math.abs(tau - t) < 3 ? "bg-cyan-400/20 text-cyan-200" : "text-slate-500 hover:text-slate-200",
-                )}
+                className={cx("absolute -translate-x-1/2 rounded-sm px-1 py-px text-[11px] tnum transition-colors", Math.abs(tau - t) < 3 ? "bg-accent-subtle font-medium text-accent-fg" : "text-fg-4 hover:text-fg")}
                 style={{ left: `${((t - min) / (HORIZON_MIN - min)) * 100}%` }}
               >
-                {t === 0 ? "NOW" : t < 0 ? `${t}` : `+${t}`}
+                {t === 0 ? "Now" : t < 0 ? `${t}` : `+${t}`}
               </button>
             ))}
           </div>
         </div>
         {!compact && (
-          <div className="w-24 shrink-0 text-right leading-tight" title="Forecast confidence decays with lead time (prototype curve)">
-            <div className="font-mono text-lg font-semibold text-white tnum">{Math.round(conf * 100)}%</div>
-            <div className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">Confidence</div>
+          <div className="w-20 shrink-0 text-right leading-tight" title="Forecast confidence decays with lead time (prototype curve)">
+            <div className="text-lg font-semibold text-fg tnum">{Math.round(conf * 100)}%</div>
+            <div className="text-xs text-fg-3">Confidence</div>
           </div>
         )}
       </div>

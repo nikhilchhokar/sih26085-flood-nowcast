@@ -467,7 +467,7 @@ export default function FloodMap(props: FloodMapProps) {
       id: "sectors-sel",
       type: "line",
       source: "sectors",
-      filter: ["==", ["get", "sid"], "__none__"],
+      filter: ["==", ["get","sid"],"__none__"],
       paint: { "line-color": "#0891b2", "line-width": 3, "line-opacity": 0.95 },
     });
 
@@ -484,7 +484,7 @@ export default function FloodMap(props: FloodMapProps) {
       id: "roads-casing",
       type: "line",
       source: "roads",
-      filter: ["==", ["get", "major"], true],
+      filter: ["==", ["get","major"], true],
       layout: { "line-cap": "round", "line-join": "round" },
       paint: {
         "line-color": "#ffffff",
@@ -497,7 +497,7 @@ export default function FloodMap(props: FloodMapProps) {
       id: "roads-minor",
       type: "line",
       source: "roads",
-      filter: ["!=", ["get", "major"], true],
+      filter: ["!=", ["get","major"], true],
       layout: { "line-cap": "round", "line-join": "round" },
       paint: {
         "line-color": roadColor as never,
@@ -509,7 +509,7 @@ export default function FloodMap(props: FloodMapProps) {
       id: "roads",
       type: "line",
       source: "roads",
-      filter: ["==", ["get", "major"], true],
+      filter: ["==", ["get","major"], true],
       layout: { "line-cap": "round", "line-join": "round" },
       paint: {
         "line-color": roadColor as never,
@@ -533,7 +533,7 @@ export default function FloodMap(props: FloodMapProps) {
       id: "pipes-hl",
       type: "line",
       source: "pipes",
-      filter: ["==", ["get", "pid"], "__none__"],
+      filter: ["==", ["get","pid"],"__none__"],
       paint: { "line-color": "#06b6d4", "line-width": 9, "line-opacity": 0.5, "line-blur": 1, "line-offset": ["interpolate", ["linear"], ["zoom"], 12, 2.5, 16, 8] },
     });
     add({
@@ -543,7 +543,7 @@ export default function FloodMap(props: FloodMapProps) {
       layout: { "line-cap": "round", "line-join": "round" },
       paint: {
         "line-color": utilColor as never,
-        "line-width": ["interpolate", ["linear"], ["zoom"], 12, ["+", 0.8, ["*", ["get", "d"], 0.45]], 16, ["+", 2.2, ["*", ["get", "d"], 1.4]]] as never,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 12, ["+", 0.8, ["*", ["get","d"], 0.45]], 16, ["+", 2.2, ["*", ["get","d"], 1.4]]] as never,
         "line-opacity": ["interpolate", ["linear"], u, 0, 0.55, 0.75, 0.8, 0.9, 0.95] as never,
         "line-offset": ["interpolate", ["linear"], ["zoom"], 12, 2.5, 16, 8],
       },
@@ -566,7 +566,7 @@ export default function FloodMap(props: FloodMapProps) {
       id: "routes-alt",
       type: "line",
       source: "routes",
-      filter: ["!", ["get", "selected"]],
+      filter: ["!", ["get","selected"]],
       layout: { "line-cap": "round", "line-join": "round" },
       paint: { "line-color": ["case", ["get", "passable"], "#475569", "#dc2626"] as never, "line-width": 4, "line-opacity": 0.85, "line-dasharray": [1.6, 1.2] },
     });
@@ -595,7 +595,7 @@ export default function FloodMap(props: FloodMapProps) {
       id: "nodes-blocked",
       type: "circle",
       source: "nodes",
-      filter: ["==", ["get", "blocked"], true],
+      filter: ["==", ["get","blocked"], true],
       paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 12, 6, 16, 11], "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#d97706", "circle-stroke-width": 2.2 },
     });
     add({
@@ -628,7 +628,7 @@ export default function FloodMap(props: FloodMapProps) {
       id: "nodes-sel",
       type: "circle",
       source: "nodes",
-      filter: ["==", ["get", "nid"], "__none__"],
+      filter: ["==", ["get","nid"],"__none__"],
       paint: { "circle-radius": 13, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#0891b2", "circle-stroke-width": 3 },
     });
   }
@@ -671,7 +671,7 @@ export default function FloodMap(props: FloodMapProps) {
     vis("evac", layers.routes || variant === "evacuation");
     if (map.getLayer("roads")) {
       const dim = variant === "drainage";
-      map.setPaintProperty("roads", "line-opacity", dim ? ["case", ["==", ["coalesce", ["feature-state", "r"], 0], 0], 0.18, 0.7] : ["case", ["==", ["coalesce", ["feature-state", "r"], 0], 0], variant === "routing" ? 0.7 : 0.5, 0.95]);
+      map.setPaintProperty("roads", "line-opacity", dim ? ["case", ["==", ["coalesce", ["feature-state","r"], 0], 0], 0.18, 0.7] : ["case", ["==", ["coalesce", ["feature-state","r"], 0], 0], variant === "routing" ? 0.7 : 0.5, 0.95]);
       map.setPaintProperty("rain", "raster-opacity", variant === "rainfall" ? 0.9 : 0.72);
     }
   }, [layers, styleVersion, variant]);
@@ -895,7 +895,7 @@ export default function FloodMap(props: FloodMapProps) {
     let roadIds: string[] = [...(highlightRoadIds ?? [])];
     let nodeId = "__none__";
     let sectorId = focusSectorId ?? "__none__";
-    let pipeFilter: maplibregl.FilterSpecification = ["==", ["get", "pid"], "__none__"];
+    let pipeFilter: maplibregl.FilterSpecification = ["==", ["get","pid"],"__none__"];
     if (selection?.kind === "road") {
       roadIds.push(selection.id);
       const r = ds.roads.find((x) => x.id === selection.id);
@@ -904,7 +904,7 @@ export default function FloodMap(props: FloodMapProps) {
       nodeId = selection.id;
       const n = ds.drainNodes.find((x) => x.id === selection.id);
       if (n) roadIds = roadIds.concat(n.roadIds);
-      pipeFilter = ["any", ["==", ["get", "from"], selection.id], ["==", ["get", "to"], selection.id]];
+      pipeFilter = ["any", ["==", ["get","from"], selection.id], ["==", ["get","to"], selection.id]];
     } else if (selection?.kind === "sector") {
       sectorId = selection.id;
     } else if (selection?.kind === "junction") {
@@ -912,8 +912,8 @@ export default function FloodMap(props: FloodMapProps) {
       if (j) roadIds = roadIds.concat(j.roadIds);
     }
     map.setFilter("roads-hl", ["in", ["get", "rid"], ["literal", roadIds]]);
-    map.setFilter("nodes-sel", ["==", ["get", "nid"], nodeId]);
-    map.setFilter("sectors-sel", ["==", ["get", "sid"], sectorId]);
+    map.setFilter("nodes-sel", ["==", ["get","nid"], nodeId]);
+    map.setFilter("sectors-sel", ["==", ["get","sid"], sectorId]);
     map.setFilter("pipes-hl", pipeFilter);
   }, [selection, highlightRoadIds, focusSectorId, styleVersion, ds]);
 
@@ -1065,12 +1065,12 @@ export default function FloodMap(props: FloodMapProps) {
         return v ? createPortal(<VehicleMarker kind={v.kind} label={v.label} active={v.active} />, el, `veh:${id}`) : null;
       })}
       {fallback && (
-        <div className="absolute top-2 left-1/2 z-10 -translate-x-1/2 rounded-md border border-amber-500/40 bg-ink-900/90 px-3 py-1 text-[11px] text-amber-300">
+        <div className="absolute top-2 left-1/2 z-10 -translate-x-1/2 rounded-md border border-warn/40 bg-surface px-3 py-1 text-xs text-warn">
           Basemap tiles unreachable — showing offline schematic (OSM snapshot)
         </div>
       )}
       {pickMode && (
-        <div className="pointer-events-none absolute top-2 left-1/2 z-10 -translate-x-1/2 rounded-md border border-cyan-400/40 bg-ink-900/90 px-3 py-1 text-[11px] text-cyan-200">
+        <div className="pointer-events-none absolute top-2 left-1/2 z-10 -translate-x-1/2 rounded-md border border-accent/40 bg-surface px-3 py-1 text-xs text-accent">
           Click on the map to set the emergency location
         </div>
       )}

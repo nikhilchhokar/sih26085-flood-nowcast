@@ -52,7 +52,7 @@ export default function DataSourcesPage() {
         <Panel title="Source architecture" icon={<Database className="h-3.5 w-3.5" />} bodyClassName="p-0">
           <table className="w-full text-xs">
             <thead>
-              <tr className="text-left text-[9.5px] tracking-wider text-slate-500 uppercase">
+              <tr className="text-left text-xs text-fg-4">
                 <th className="px-3 py-2">Category</th>
                 <th className="px-2 py-2">Intended source</th>
                 <th className="px-2 py-2">In this prototype</th>
@@ -62,14 +62,14 @@ export default function DataSourcesPage() {
             </thead>
             <tbody>
               {SOURCES.map((s) => (
-                <tr key={s.cat} className="border-t border-ink-700/60 align-top">
-                  <td className="px-3 py-2 font-semibold text-white">{s.cat}</td>
-                  <td className="px-2 py-2 text-slate-300">{s.intended}</td>
-                  <td className="px-2 py-2 text-slate-400">{s.proto}</td>
+                <tr key={s.cat} className="border-t border-line align-top">
+                  <td className="px-3 py-2 font-semibold text-fg">{s.cat}</td>
+                  <td className="px-2 py-2 text-fg-2">{s.intended}</td>
+                  <td className="px-2 py-2 text-fg-3">{s.proto}</td>
                   <td className="px-2 py-2">
                     <Tag tone={TONE[s.mode]}>{s.mode}</Tag>
                   </td>
-                  <td className="px-3 py-2 text-[11px] text-slate-500">{s.note}</td>
+                  <td className="px-3 py-2 text-xs text-fg-4">{s.note}</td>
                 </tr>
               ))}
             </tbody>
@@ -83,14 +83,14 @@ export default function DataSourcesPage() {
                   key={b}
                   type="button"
                   onClick={() => setBasemap(b)}
-                  className={cx("w-full rounded-lg border px-3 py-2 text-left", basemap === b ? "border-cyan-400/60 bg-cyan-400/10" : "border-ink-700 bg-ink-850 hover:border-ink-500")}
+                  className={cx("w-full rounded border px-3 py-2 text-left", basemap === b ? "border-accent/40 bg-accent-subtle" : "border-line bg-surface-2 hover:border-line-strong")}
                 >
-                  <div className="text-xs font-semibold text-white">{BASEMAPS[b].label}</div>
-                  <div className="text-[11px] text-slate-500">{BASEMAPS[b].note}</div>
+                  <div className="text-xs font-semibold text-fg">{BASEMAPS[b].label}</div>
+                  <div className="text-xs text-fg-4">{BASEMAPS[b].note}</div>
                 </button>
               ))}
             </div>
-            <p className="mt-2 text-[10.5px] text-slate-500">Tip for the venue: choose the offline schematic if Wi-Fi is unreliable — every screen keeps working.</p>
+            <p className="mt-2 text-xs text-fg-4">Tip for the venue: choose the offline schematic if Wi-Fi is unreliable — every screen keeps working.</p>
           </Panel>
           <Panel title="Demo controls" icon={<Settings className="h-3.5 w-3.5" />} className="shrink-0">
             <Toggle checked={flags.radarOutage} onChange={(v) => setFlag("radarOutage", v)} label="Simulate IMD radar outage" />
@@ -111,11 +111,11 @@ export default function DataSourcesPage() {
             <KV k="Road segments" v={ds?.roads.length} />
             <KV k="Drain nodes / pipes" v={ds ? `${ds.drainNodes.length} / ${ds.drainEdges.length}` : "—"} />
             <KV k="Facilities" v={ds?.pois.length} />
-            <KV k="OSM snapshot" v={ds ? new Date(ds.fetchedAt).toLocaleDateString("en-GB") : "—"} />
+            <KV k="OSM snapshot" v={ds ? new Date(ds.fetchedAt).toLocaleDateString("en-GB") :"—"} />
             <KV k="API base" v={<span className="font-mono">{API_BASE}</span>} />
-            <p className="mt-2 text-[10.5px] text-slate-500">{ds?.attribution.osm} · {ds?.attribution.dem}</p>
+            <p className="mt-2 text-xs text-fg-4">{ds?.attribution.osm} · {ds?.attribution.dem}</p>
           </Panel>
-          <div className="flex items-start gap-2 rounded-xl border border-amber-400/30 bg-amber-400/5 px-3 py-2 text-[11px] text-amber-200/90">
+          <div className="flex items-start gap-2 rounded border border-warn/40 bg-warn-subtle px-3 py-2 text-xs text-warn">
             <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
             Flood depths, drain states, alerts and historical events are simulated for demonstration and must not be used for real decisions.
           </div>

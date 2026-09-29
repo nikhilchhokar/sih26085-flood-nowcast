@@ -37,13 +37,13 @@ export const RISK_COLOR: Record<RiskLevel, string> = {
   critical: "#7f1d1d",
 };
 
-/** Risk colours tuned for text / numbers on the dark console background. */
+/** Risk colours for text / numbers — CSS variables so they follow the light/dark theme. */
 export const RISK_TEXT: Record<RiskLevel, string> = {
-  safe: "#4ade80",
-  low: "#facc15",
-  moderate: "#fb923c",
-  high: "#f87171",
-  critical: "#ff4d5e",
+  safe: "var(--risk-safe)",
+  low: "var(--risk-low)",
+  moderate: "var(--risk-moderate)",
+  high: "var(--risk-high)",
+  critical: "var(--risk-critical)",
 };
 
 export const RISK_RANGE: Record<RiskLevel, string> = {

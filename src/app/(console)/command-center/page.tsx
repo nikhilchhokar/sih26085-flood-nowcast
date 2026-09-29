@@ -86,7 +86,7 @@ export default function CommandCenter() {
       <KpiStrip summary={summary} rain={rain} horizonLabel={demo.active ? `Forecast to T+${horizon} min` : "Forecast 0–3 h"} actions={actions.length} />
       <div className="flex min-h-0 flex-1 gap-2.5">
         <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-          <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl border border-ink-700">
+          <div className="relative min-h-0 flex-1 overflow-hidden rounded border border-line">
             {ds ? (
               <FloodMap
                 ds={ds}
@@ -109,8 +109,8 @@ export default function CommandCenter() {
                 <TimeBar degraded={radarOutage} />
                 <DetailPanel ds={ds} res={now?.result} clock={clock} selection={selection} onClose={() => select(null)} onSelect={select} offsetTop={demo.active && !demo.finished ? 150 : 12} />
                 {route && (
-                  <div className="absolute top-3 left-1/2 z-10 -translate-x-1/2 rounded-lg border border-emerald-500/60 bg-emerald-950/90 px-4 py-1.5 text-center shadow-xl" style={{ top: demo.active && !demo.finished ? 150 : 12 }}>
-                    <div className="flex items-center gap-2 text-xs font-extrabold tracking-[0.18em] text-emerald-300 uppercase">
+                  <div className="absolute top-3 left-1/2 z-10 -translate-x-1/2 rounded border border-ok/50 bg-ok-subtle px-4 py-1.5 text-center shadow-float" style={{ top: demo.active && !demo.finished ? 150 : 12 }}>
+                    <div className="flex items-center gap-2 text-xs font-semibold text-ok">
                       <ShieldCheck className="h-4 w-4" /> Safe route mode active
                     </div>
                   </div>
@@ -131,7 +131,7 @@ export default function CommandCenter() {
             icon={<Siren className="h-3.5 w-3.5" />}
             sim
             right={
-              <Link href="/alerts" className="text-[11px] text-cyan-300 hover:underline">
+              <Link href="/alerts" className="text-xs text-accent hover:underline">
                 All →
               </Link>
             }
@@ -139,10 +139,10 @@ export default function CommandCenter() {
             bodyClassName="p-2.5"
           >
             {alertsVisible ? (
-              <AlertList alerts={alerts} compact limit={4} emptyText={sectorId ? "No alerts for this ward." : "No active alerts."} />
+              <AlertList alerts={alerts} compact limit={4} emptyText={sectorId ? "No alerts for this ward.":"No active alerts."} />
             ) : (
-              <div className="flex items-center gap-2 rounded-lg border border-ink-700 bg-ink-850 px-3 py-3 text-xs text-slate-400">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 blink-soft" /> Monitoring… thresholds not yet exceeded
+              <div className="flex items-center gap-2 rounded border border-line bg-surface-2 px-3 py-3 text-xs text-fg-3">
+                <span className="h-2 w-2 rounded-full bg-emerald-400" /> Monitoring… thresholds not yet exceeded
               </div>
             )}
           </Panel>
@@ -151,17 +151,17 @@ export default function CommandCenter() {
             icon={<ClipboardCheck className="h-3.5 w-3.5" />}
             sim
             right={
-              <Link href="/actions" className="text-[11px] text-cyan-300 hover:underline">
+              <Link href="/actions" className="text-xs text-accent hover:underline">
                 Action centre →
               </Link>
             }
-            className={cx("shrink-0", demo.active && demo.step === 8 && "ring-2 ring-cyan-400")}
+            className={cx("shrink-0", demo.active && demo.step === 8 && "ring-2 ring-accent")}
             bodyClassName="p-2.5"
           >
             {!demo.active || demo.step >= 8 || demo.finished ? (
               <ActionList actions={actions} compact />
             ) : (
-              <p className="px-1 py-2 text-xs text-slate-500">Generated once the nowcast crosses alert thresholds.</p>
+              <p className="px-1 py-2 text-xs text-fg-4">Generated once the nowcast crosses alert thresholds.</p>
             )}
           </Panel>
           <EnginePanel ds={ds} nowcast={now} className="shrink-0" />

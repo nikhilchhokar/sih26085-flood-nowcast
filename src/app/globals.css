@@ -1,41 +1,143 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jbmono), ui-monospace, SFMono-Regular, monospace;
+/*
+ * Design tokens. Components only use the semantic utilities below
+ * (bg-surface, text-fg-3, border-line, bg-accent …) so the whole console
+ * re-themes by swapping these variables.
+ */
+@theme inline {
+  --font-sans: var(--font-plex), "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
 
-  /* command-centre neutrals (deep navy) */
-  --color-ink-950: #060b16;
-  --color-ink-900: #0a1222;
-  --color-ink-850: #0d172b;
-  --color-ink-800: #111d34;
-  --color-ink-750: #16233e;
-  --color-ink-700: #1c2a48;
-  --color-ink-600: #273a5f;
-  --color-ink-500: #3a4f78;
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-fg-4: var(--fg-4);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-fg: var(--accent-fg);
+  --color-ok: var(--ok);
+  --color-ok-subtle: var(--ok-subtle);
+  --color-warn: var(--warn);
+  --color-warn-subtle: var(--warn-subtle);
+  --color-danger: var(--danger);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-rain: var(--rain);
+  --color-header: var(--header);
+  --color-header-fg: var(--header-fg);
+  --color-header-fg-2: var(--header-fg-2);
+  --color-header-line: var(--header-line);
+  --color-header-hover: var(--header-hover);
+  --color-header-field: var(--header-field);
 
-  /* semantic */
-  --color-water: #22d3ee;
-  --color-infra: #3b82f6;
-  --color-safe: #22c55e;
-  --color-low: #facc15;
-  --color-moderate: #f97316;
-  --color-high: #dc2626;
-  --color-critical: #7f1d1d;
+  --radius-card: 4px;
+  --shadow-float: 0 1px 2px rgb(16 24 40 / 0.06), 0 6px 18px rgb(16 24 40 / 0.1);
 }
 
+/* ---------- light (default) ---------- */
 :root {
+  color-scheme: light;
+  --canvas: #f2f4f7;
+  --surface: #ffffff;
+  --surface-2: #f7f8fa;
+  --surface-3: #eceff3;
+  --line: #e0e4e9;
+  --line-strong: #c5ccd5;
+  --fg: #16202b;
+  --fg-2: #34404e;
+  --fg-3: #5a6677;
+  --fg-4: #8691a0;
+  --accent: #0b5fcc;
+  --accent-hover: #094fab;
+  --accent-subtle: #e8f0fb;
+  --accent-fg: #0a4a9f;
+  --ok: #1a7f37;
+  --ok-subtle: #e6f4ea;
+  --warn: #9a6200;
+  --warn-subtle: #fdf2d5;
+  --danger: #c62828;
+  --danger-subtle: #fdeaea;
+  --rain: #0e7490;
+  --header: #14202c;
+  --header-fg: #f2f5f8;
+  --header-fg-2: #97a4b3;
+  --header-line: #253342;
+  --header-hover: #1d2b39;
+  --header-field: #1b2834;
+
+  --risk-safe: #1a7f37;
+  --risk-low: #8a6100;
+  --risk-moderate: #b54708;
+  --risk-high: #c62828;
+  --risk-critical: #7c1111;
+
+  --chart-grid: #e6e9ee;
+  --chart-axis: #6b7686;
+  --chart-1: #0b5fcc;
+  --chart-rain: #0e7490;
+  --chart-warn: #c2610c;
+}
+
+/* ---------- dark ("control room") ---------- */
+:root[data-theme="dark"] {
   color-scheme: dark;
+  --canvas: #0d1015;
+  --surface: #151920;
+  --surface-2: #1a1f27;
+  --surface-3: #222831;
+  --line: #29303a;
+  --line-strong: #3a424e;
+  --fg: #e5e9ef;
+  --fg-2: #c1c8d2;
+  --fg-3: #929cab;
+  --fg-4: #6b7483;
+  --accent: #3d8bfd;
+  --accent-hover: #5a9cff;
+  --accent-subtle: rgb(61 139 253 / 0.14);
+  --accent-fg: #8ebaff;
+  --ok: #3fb950;
+  --ok-subtle: rgb(63 185 80 / 0.14);
+  --warn: #d29922;
+  --warn-subtle: rgb(210 153 34 / 0.14);
+  --danger: #f85149;
+  --danger-subtle: rgb(248 81 73 / 0.14);
+  --rain: #38bdf8;
+  --header: #0a0d11;
+  --header-fg: #e5e9ef;
+  --header-fg-2: #8d97a5;
+  --header-line: #20262e;
+  --header-hover: #161b22;
+  --header-field: #12161c;
+  --shadow-float: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 18px rgb(0 0 0 / 0.35);
+
+  --risk-safe: #3fb950;
+  --risk-low: #e3b341;
+  --risk-moderate: #f0883e;
+  --risk-high: #f85149;
+  --risk-critical: #ff7b8a;
+
+  --chart-grid: #262c35;
+  --chart-axis: #7d8796;
+  --chart-1: #3d8bfd;
+  --chart-rain: #38bdf8;
+  --chart-warn: #f0883e;
 }
 
 html,
 body {
-  background: var(--color-ink-950);
-  color: #e2e8f0;
+  background: var(--canvas);
+  color: var(--fg);
 }
 
 body {
-  font-feature-settings: "cv11", "ss01";
+  font-size: 13px;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -43,18 +145,23 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+.shadow-float {
+  box-shadow: var(--shadow-float);
+}
+
 /* thin scrollbars inside panels */
 .scroll-thin {
   scrollbar-width: thin;
-  scrollbar-color: #273a5f transparent;
+  scrollbar-color: var(--line-strong) transparent;
 }
 .scroll-thin::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 .scroll-thin::-webkit-scrollbar-thumb {
-  background: #273a5f;
-  border-radius: 3px;
+  background: var(--line-strong);
+  border-radius: 4px;
+  border: 2px solid var(--surface);
 }
 
 /* range input */
@@ -63,8 +170,8 @@ input[type="range"].range {
   appearance: none;
   width: 100%;
   height: 4px;
-  background: #1c2a48;
-  border-radius: 999px;
+  background: var(--line);
+  border-radius: 2px;
   outline: none;
 }
 input[type="range"].range::-webkit-slider-thumb {
@@ -72,53 +179,45 @@ input[type="range"].range::-webkit-slider-thumb {
   width: 14px;
   height: 14px;
   border-radius: 999px;
-  background: #22d3ee;
-  border: 2px solid #0a1222;
-  box-shadow: 0 0 0 1px #22d3ee;
+  background: var(--surface);
+  border: 2px solid var(--accent);
   cursor: pointer;
 }
 input[type="range"].range::-moz-range-thumb {
   width: 12px;
   height: 12px;
   border-radius: 999px;
-  background: #22d3ee;
-  border: 2px solid #0a1222;
+  background: var(--surface);
+  border: 2px solid var(--accent);
   cursor: pointer;
 }
+input[type="range"].range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
 
-/* MapLibre overrides for the dark shell */
-.maplibregl-ctrl-group {
-  background: #0d172b !important;
-  border: 1px solid #273a5f;
-  box-shadow: none !important;
+select {
+  background-image: none;
 }
-.maplibregl-ctrl-group button {
-  width: 30px !important;
-  height: 30px !important;
-}
-.maplibregl-ctrl-group button + button {
-  border-top: 1px solid #273a5f !important;
-}
-.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
-  filter: invert(0.85);
-}
+
+/* MapLibre controls & popups */
 .maplibregl-ctrl-attrib {
   font-size: 10px;
-  background: rgba(255, 255, 255, 0.75) !important;
+  background: rgb(255 255 255 / 0.8) !important;
 }
 .maplibregl-popup-content {
-  background: #0d172b;
-  color: #e2e8f0;
-  border: 1px solid #273a5f;
-  border-radius: 8px;
-  padding: 6px 10px;
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  padding: 5px 9px;
   font-size: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-float);
 }
 .maplibregl-popup-tip {
   display: none;
 }
 
+/* functional map animations only */
 @keyframes pulse-ring {
   0% {
     transform: scale(0.6);
@@ -130,7 +229,7 @@ input[type="range"].range::-moz-range-thumb {
   }
 }
 .pulse-ring {
-  animation: pulse-ring 1.6s ease-out infinite;
+  animation: pulse-ring 1.8s ease-out infinite;
 }
 
 @keyframes flow-dash {
@@ -143,9 +242,9 @@ input[type="range"].range::-moz-range-thumb {
   animation: flow-dash 1.2s linear infinite;
 }
 
-@keyframes slide-up {
+@keyframes enter {
   from {
-    transform: translateY(8px);
+    transform: translateY(4px);
     opacity: 0;
   }
   to {
@@ -154,38 +253,18 @@ input[type="range"].range::-moz-range-thumb {
   }
 }
 .slide-up {
-  animation: slide-up 0.35s ease-out both;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  animation: enter 0.2s ease-out both;
 }
 .fade-in {
-  animation: fade-in 0.4s ease-out both;
+  animation: enter 0.25s ease-out both;
 }
-
-@keyframes blink-soft {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.45;
-  }
-}
+/* kept as a no-op for older markup */
 .blink-soft {
-  animation: blink-soft 1.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .pulse-ring,
   .flow-dash,
-  .blink-soft,
   .slide-up,
   .fade-in {
     animation: none;

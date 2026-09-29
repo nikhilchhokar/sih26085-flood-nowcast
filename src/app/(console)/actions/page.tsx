@@ -29,7 +29,7 @@ export default function ActionsPage() {
         id: a.id,
         coord: a.coord,
         node: (
-          <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-cyan-600 font-mono text-[11px] font-bold text-white shadow-lg" title={a.title}>
+          <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-accent font-mono text-xs font-semibold text-fg shadow-lg" title={a.title}>
             {i + 1}
           </div>
         ),
@@ -48,9 +48,9 @@ export default function ActionsPage() {
         right={<SimTag label="Simulated recommendations" />}
       />
       <div className="grid grid-cols-4 gap-2.5">
-        <Stat value={actions.filter((a) => a.priority === "P1").length} label="Priority 1" tone="#f87171" sub="Act within 15 min" />
-        <Stat value={actions.filter((a) => a.priority === "P2").length} label="Priority 2" tone="#fbbf24" sub="Act within 30 min" />
-        <Stat value={`${handled}/${actions.length}`} label="Actioned" tone={handled === actions.length && actions.length ? "#4ade80" : undefined} sub="Dispatch · notify · reroute · ack" />
+        <Stat value={actions.filter((a) => a.priority === "P1").length} label="Priority 1" tone="var(--danger)" sub="Act within 15 min" />
+        <Stat value={actions.filter((a) => a.priority === "P2").length} label="Priority 2" tone="var(--warn)" sub="Act within 30 min" />
+        <Stat value={`${handled}/${actions.length}`} label="Actioned" tone={handled === actions.length && actions.length ? "var(--ok)" : undefined} sub="Dispatch · notify · reroute · ack" />
         <Stat value={ds?.pois.filter((p) => p.kind === "shelter").length ?? "—"} label="Shelters available" sub="Designated (demo)" />
       </div>
       <div className="flex min-h-0 flex-1 gap-2.5">
@@ -58,7 +58,7 @@ export default function ActionsPage() {
           {actions.length ? <ActionList actions={actions} /> : <Loading />}
         </Panel>
         <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-          <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl border border-ink-700">
+          <div className="relative min-h-0 flex-1 overflow-hidden rounded border border-line">
             {ds ? (
               <FloodMap ds={ds} res={now?.result} clock={clock} layers={{ ...layers, rain: false }} selection={selection} onSelect={select} focus={focus} extraMarkers={markers}>
                 <MapToolbar />
@@ -75,9 +75,9 @@ export default function ActionsPage() {
               log
                 .filter((l) => l.kind === "action")
                 .map((l) => (
-                  <div key={l.id} className={cx("flex gap-2 border-t border-ink-700/60 px-3 py-1.5 text-[11.5px] first:border-t-0")}>
-                    <span className="font-mono text-[10px] text-slate-500">{new Date(l.at).toLocaleTimeString("en-IN", { hour12: false })}</span>
-                    <span className="text-emerald-300">{l.text}</span>
+                  <div key={l.id} className={cx("flex gap-2 border-t border-line px-3 py-1.5 text-xs first:border-t-0")}>
+                    <span className="font-mono text-xs text-fg-4">{new Date(l.at).toLocaleTimeString("en-IN", { hour12: false })}</span>
+                    <span className="text-ok">{l.text}</span>
                   </div>
                 ))
             ) : (

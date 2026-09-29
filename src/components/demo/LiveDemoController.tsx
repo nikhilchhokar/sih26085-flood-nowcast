@@ -81,7 +81,7 @@ export function LiveDemoController() {
     const onKey = (e: KeyboardEvent) => {
       const st = useApp.getState();
       if ((e.target as HTMLElement)?.tagName === "INPUT") return;
-      if (e.key === " ") {
+      if (e.key === "") {
         e.preventDefault();
         st.setDemo({ paused: !st.demo.paused });
       } else if (e.key === "ArrowRight") st.setDemo({ step: Math.min(STEPS.length - 1, st.demo.step + 1), finished: false });
@@ -109,7 +109,7 @@ export function LiveDemoController() {
         break;
       case "coupling":
         st.setLayers({ rain: true, drainage: true, flow: true, surcharge: true });
-        st.pushLog("Live demo: rainfall forcing coupled into drainage graph", "info");
+        st.pushLog("Live demo: rainfall forcing coupled into drainage graph","info");
         break;
       case "filling":
         st.setLayers({ rain: false });
@@ -151,7 +151,7 @@ export function LiveDemoController() {
             })
             .catch(() => {});
         }
-        st.pushLog("Ambulance route recalculated (safe route mode)", "action");
+        st.pushLog("Ambulance route recalculated (safe route mode)","action");
         break;
       }
       case "actions":

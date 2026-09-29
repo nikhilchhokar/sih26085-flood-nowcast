@@ -25,9 +25,9 @@ export function fusionCards(ds?: CityDataset, health?: HealthResponse): Card[] {
       label: "Rainfall",
       icon: <CloudRain className="h-3.5 w-3.5" />,
       status: rainStatus,
-      lines: [radar?.status === "offline" ? "Radar offline · AWS fallback" : "IMD radar + AWS", `Updated ${agoLabel(Math.min(radar?.updatedAgoSec ?? 120, aws?.updatedAgoSec ?? 60))}`],
+      lines: [radar?.status === "offline" ? "Radar offline · AWS fallback":"IMD radar + AWS", `Updated ${agoLabel(Math.min(radar?.updatedAgoSec ?? 120, aws?.updatedAgoSec ?? 60))}`],
     },
-    { id: "dem", label: "Terrain / DEM", icon: <Mountain className="h-3.5 w-3.5" />, status: "static", lines: ["Resolution 30 m", "SRTM (static)"] },
+    { id: "dem", label: "Terrain / DEM", icon: <Mountain className="h-3.5 w-3.5" />, status: "static", lines: ["Resolution 30 m","SRTM (static)"] },
     { id: "lu", label: "Land use", icon: <Trees className="h-3.5 w-3.5" />, status: "static", lines: ["Urban GIS / OSM", `Impervious ${Math.round(((ds?.sectors.reduce((s, x) => s + x.impervious, 0) ?? 0) / Math.max(1, ds?.sectors.length ?? 1)) * 100)}%`] },
     {
       id: "drain",
@@ -43,37 +43,37 @@ export function fusionCards(ds?: CityDataset, health?: HealthResponse): Card[] {
       status: wl?.status ?? "online",
       lines: ["Drain level sensors", `Updated ${agoLabel(wl?.updatedAgoSec ?? 60)}`],
     },
-    { id: "hist", label: "Historical floods", icon: <Archive className="h-3.5 w-3.5" />, status: "static", lines: ["Events loaded: 128", "Synthetic catalogue"] },
+    { id: "hist", label: "Historical floods", icon: <Archive className="h-3.5 w-3.5" />, status: "static", lines: ["Events loaded: 128","Synthetic catalogue"] },
   ];
 }
+
+const STATUS_TEXT: Record<HealthStatus, { label: string; color: string }> = {
+  online: { label: "Online", color: "var(--ok)" },
+  static: { label: "Ready", color: "var(--accent)" },
+  delayed: { label: "Delayed", color: "var(--warn)" },
+  warning: { label: "Degraded", color: "var(--warn)" },
+  offline: { label: "Offline", color: "var(--danger)" },
+};
 
 export function DataFusionStrip({ ds, health, className }: { ds?: CityDataset; health?: HealthResponse; className?: string }) {
   const cards = fusionCards(ds, health);
   return (
-    <div className={cx("flex items-stretch gap-2", className)}>
-      <div className="flex w-28 shrink-0 flex-col justify-center rounded-xl border border-ink-700 bg-ink-900/90 px-3">
-        <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] text-slate-300 uppercase">
-          <Database className="h-3.5 w-3.5 text-cyan-300" /> Data fusion
-        </div>
-        <div className="mt-1 text-[9.5px] leading-tight text-slate-500">
-          Fusion <ChevronRight className="inline h-2.5 w-2.5" /> Modelling <ChevronRight className="inline h-2.5 w-2.5" /> Nowcast <ChevronRight className="inline h-2.5 w-2.5" /> Action
-        </div>
+    <div className={cx("flex items-stretch overflow-hidden rounded border border-line bg-surface", className)}>
+      <div className="flex w-32 shrink-0 flex-col justify-center border-r border-line px-3">
+        <div className="text-[13px] font-semibold text-fg">Data fusion</div>
+        <div className="text-xs text-fg-4">Inputs to the model</div>
       </div>
-      {cards.map((c) => (
-        <div key={c.id} className="min-w-0 flex-1 rounded-xl border border-ink-700 bg-ink-900/90 px-2.5 py-1.5">
+      {cards.map((c, i) => (
+        <div key={c.id} className={cx("min-w-0 flex-1 px-3 py-1.5", i > 0 && "border-l border-line")}>
           <div className="flex items-center gap-1.5">
-            <span className="text-slate-400">{c.icon}</span>
-            <span className="truncate text-[10px] font-bold tracking-wider text-slate-300 uppercase">{c.label}</span>
-            <StatusDot status={c.status} className="ml-auto shrink-0" />
+            <span className="text-fg-4">{c.icon}</span>
+            <span className="truncate text-xs font-medium text-fg-2">{c.label}</span>
           </div>
-          <div className="mt-0.5 text-[10px] font-semibold tracking-wide uppercase" style={{ color: c.status === "online" ? "#4ade80" : c.status === "static" ? "#60a5fa" : c.status === "delayed" ? "#facc15" : "#fb923c" }}>
-            {c.status === "static" ? "Ready" : c.status}
+          <div className="mt-0.5 flex items-center gap-1.5 text-xs font-medium" style={{ color: STATUS_TEXT[c.status].color }}>
+            <StatusDot status={c.status} />
+            {STATUS_TEXT[c.status].label}
           </div>
-          {c.lines.map((l) => (
-            <div key={l} className="truncate text-[10.5px] text-slate-400">
-              {l}
-            </div>
-          ))}
+          <div className="truncate text-xs text-fg-3">{c.lines.join(" · ")}</div>
         </div>
       ))}
     </div>

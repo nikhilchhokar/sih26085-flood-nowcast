@@ -70,21 +70,21 @@ export default function ModelPage() {
   return (
     <div className="scroll-thin flex h-full flex-col gap-2.5 overflow-y-auto p-2.5">
       <PageHeader kicker="Model performance · validation" title="Model Performance" subtitle="What we will measure, what we target, and where the reference numbers come from." />
-      <div className="flex items-start gap-3 rounded-xl border border-amber-400/40 bg-amber-400/[0.07] px-4 py-3">
-        <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
-        <div className="text-[13px] leading-relaxed text-amber-100/90">
-          <b className="text-amber-200">No PI-GNN has been trained or evaluated for this prototype yet.</b> Precision/recall below are <b>literature reference values</b> cited in our proposal (census-tract level),
+      <div className="flex items-start gap-3 rounded border border-warn/40 bg-warn-subtle px-4 py-3">
+        <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-warn" />
+        <div className="text-[13px] leading-relaxed text-warn">
+          <b className="text-warn">No PI-GNN has been trained or evaluated for this prototype yet.</b> Precision/recall below are <b>literature reference values</b> cited in our proposal (census-tract level),
           the other figures are <b>prototype targets</b>, and the scatter / confusion matrix are <b>illustrative</b>. The flood maps in this demo come from a simplified coupled rainfall–drainage engine.
         </div>
       </div>
 
       <div className="grid grid-cols-5 gap-2.5">
         {METRICS.map((m) => (
-          <div key={m.label} className="rounded-xl border border-ink-700 bg-ink-900/90 p-3.5">
+          <div key={m.label} className="rounded border border-line bg-surface p-3.5">
             <Tag tone={m.tone as "violet"}>{m.tag}</Tag>
-            <div className="mt-2 font-mono text-3xl font-semibold text-white">{m.value}</div>
-            <div className="text-[10.5px] font-bold tracking-[0.1em] text-slate-400 uppercase">{m.label}</div>
-            <p className="mt-1.5 text-[11px] leading-snug text-slate-500">{m.note}</p>
+            <div className="mt-2 font-mono text-3xl font-semibold text-fg">{m.value}</div>
+            <div className="text-xs font-semibold text-fg-3">{m.label}</div>
+            <p className="mt-1.5 text-xs leading-snug text-fg-4">{m.note}</p>
           </div>
         ))}
       </div>
@@ -94,13 +94,13 @@ export default function ModelPage() {
           <div className="h-60">
             <ResponsiveContainer>
               <ScatterChart margin={{ top: 8, right: 10, left: -10, bottom: 4 }}>
-                <CartesianGrid stroke="#1c2a48" />
-                <XAxis type="number" dataKey="obs" name="Observed" unit=" m" domain={[0, 1.6]} tick={axisTick} axisLine={false} tickLine={false} />
-                <YAxis type="number" dataKey="pred" name="Predicted" unit=" m" domain={[0, 1.6]} tick={axisTick} axisLine={false} tickLine={false} />
+                <CartesianGrid stroke="var(--chart-grid)" />
+                <XAxis type="number" dataKey="obs" name="Observed" unit="m" domain={[0, 1.6]} tick={axisTick} axisLine={false} tickLine={false} />
+                <YAxis type="number" dataKey="pred" name="Predicted" unit="m" domain={[0, 1.6]} tick={axisTick} axisLine={false} tickLine={false} />
                 <ZAxis range={[20, 20]} />
                 <Tooltip {...chartTooltip} />
-                <ReferenceLine segment={[{ x: 0, y: 0 }, { x: 1.6, y: 1.6 }]} stroke="#64748b" strokeDasharray="4 4" />
-                <Scatter data={scatter} fill="#22d3ee" fillOpacity={0.55} isAnimationActive={false} />
+                <ReferenceLine segment={[{ x: 0, y: 0 }, { x: 1.6, y: 1.6 }]} stroke="var(--chart-axis)" strokeDasharray="4 4" />
+                <Scatter data={scatter} fill="var(--chart-rain)" fillOpacity={0.55} isAnimationActive={false} />
               </ScatterChart>
             </ResponsiveContainer>
           </div>
@@ -109,7 +109,7 @@ export default function ModelPage() {
           <div className="h-60">
             <ResponsiveContainer>
               <BarChart data={dist} margin={{ top: 8, right: 8, left: -14, bottom: 0 }}>
-                <CartesianGrid stroke="#1c2a48" vertical={false} />
+                <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
                 <XAxis dataKey="label" tick={axisTick} axisLine={false} tickLine={false} />
                 <YAxis tick={axisTick} axisLine={false} tickLine={false} />
                 <Tooltip {...chartTooltip} />
@@ -123,20 +123,20 @@ export default function ModelPage() {
           </div>
         </Panel>
         <Panel title="Confusion matrix" subtitle="Illustrative 5-class layout for street risk evaluation" right={<Tag tone="amber">Illustrative</Tag>}>
-          <div className="grid grid-cols-[auto_repeat(5,1fr)] gap-1 text-center text-[10px]">
+          <div className="grid grid-cols-[auto_repeat(5,1fr)] gap-1 text-center text-xs">
             <div />
             {RISK_ORDER.map((r) => (
-              <div key={r} className="font-bold tracking-wider text-slate-500 uppercase">
+              <div key={r} className="font-semibold text-fg-4">
                 {RISK_LABEL[r].slice(0, 4)}
               </div>
             ))}
             {cm.map((row, i) => (
               <div key={i} className="contents">
-                <div className="pr-1 text-right font-bold tracking-wider text-slate-500 uppercase">{RISK_LABEL[RISK_ORDER[i]].slice(0, 4)}</div>
+                <div className="pr-1 text-right font-semibold text-fg-4">{RISK_LABEL[RISK_ORDER[i]].slice(0, 4)}</div>
                 {row.map((v, j) => (
                   <div
                     key={j}
-                    className={cx("flex h-9 items-center justify-center rounded font-mono text-xs", i === j ? "text-white" : "text-slate-300")}
+                    className={cx("flex h-9 items-center justify-center rounded font-mono text-xs", i === j ? "text-fg" : "text-fg-2")}
                     style={{ background: i === j ? `rgba(34,211,238,${0.2 + (v / maxCm) * 0.7})` : `rgba(248,113,113,${Math.min(0.5, v / 40)})` }}
                   >
                     {v}
@@ -145,7 +145,7 @@ export default function ModelPage() {
               </div>
             ))}
           </div>
-          <div className="mt-2 flex justify-between text-[10px] text-slate-500">
+          <div className="mt-2 flex justify-between text-xs text-fg-4">
             <span>rows: observed</span>
             <span>columns: predicted</span>
           </div>
@@ -156,20 +156,20 @@ export default function ModelPage() {
         <Panel title="Training data (planned)" icon={<BookOpen className="h-3.5 w-3.5" />}>
           <div className="space-y-2">
             {TRAINING.map((t) => (
-              <div key={t.name} className="rounded-lg border border-ink-700 bg-ink-850 px-3 py-2">
+              <div key={t.name} className="rounded border border-line bg-surface-2 px-3 py-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-semibold text-white">{t.name}</span>
+                  <span className="text-[13px] font-semibold text-fg">{t.name}</span>
                   <Tag tone="slate" className="ml-auto">
                     {t.status}
                   </Tag>
                 </div>
-                <p className="mt-0.5 text-[11.5px] text-slate-400">{t.detail}</p>
+                <p className="mt-0.5 text-xs text-fg-3">{t.detail}</p>
               </div>
             ))}
           </div>
         </Panel>
         <Panel title="Evaluation protocol" icon={<FlaskConical className="h-3.5 w-3.5" />}>
-          <ul className="space-y-1.5 text-[12.5px] text-slate-300">
+          <ul className="space-y-1.5 text-[12.5px] text-fg-2">
             <li>• Hold-out storms per ward (no temporal leakage)</li>
             <li>• POD / FAR / CSI at the 0.3 m “unsafe road” threshold</li>
             <li>• Street-depth MAE &amp; RMSE vs SWMM / HEC-RAS 2D</li>

@@ -29,6 +29,7 @@ export type Selection =
 export type AlertStatus = "new" | "acknowledged" | "dispatched" | "incident";
 export type ActionStatus = "pending" | "dispatched" | "notified" | "rerouted" | "acknowledged";
 export type Basemap = "openfreemap" | "carto" | "offline";
+export type Theme = "light" | "dark";
 
 export interface LogEntry {
   id: number;
@@ -95,6 +96,7 @@ interface AppState {
   toasts: Toast[];
   flags: { radarOutage: boolean; awsDelay: boolean };
   basemap: Basemap;
+  theme: Theme;
   demo: DemoState;
   routing: {
     vehicle: "ambulance" | "fire" | "police";
@@ -124,6 +126,7 @@ interface AppState {
   dismissToast: (id: number) => void;
   setFlag: (k: "radarOutage" | "awsDelay", v: boolean) => void;
   setBasemap: (b: Basemap) => void;
+  setTheme: (t: Theme) => void;
   setDemo: (d: Partial<DemoState>) => void;
   setRouting: (r: Partial<AppState["routing"]>) => void;
   markNotificationsSeen: (n: number) => void;
@@ -152,6 +155,7 @@ export const useApp = create<AppState>()(
       toasts: [],
       flags: { radarOutage: false, awsDelay: false },
       basemap: "openfreemap",
+      theme: "light",
       demo: { active: false, step: 0, paused: false, finished: false, route: null, highlight: [], runId: 0 },
       routing: {
         vehicle: "ambulance",
@@ -204,6 +208,7 @@ export const useApp = create<AppState>()(
       dismissToast: (id) => set((s) => ({ toasts: s.toasts.filter((x) => x.id !== id) })),
       setFlag: (k, v) => set((s) => ({ flags: { ...s.flags, [k]: v } })),
       setBasemap: (basemap) => set({ basemap }),
+      setTheme: (theme) => set({ theme }),
       setDemo: (d) => set((s) => ({ demo: { ...s.demo, ...d } })),
       setRouting: (r) => set((s) => ({ routing: { ...s.routing, ...r } })),
       markNotificationsSeen: (notificationsSeen) => set({ notificationsSeen }),
@@ -226,7 +231,7 @@ export const useApp = create<AppState>()(
     {
       name: "sih26085-console",
       skipHydration: true,
-      partialize: (s) => ({ city: s.city, basemap: s.basemap, flags: s.flags }),
+      partialize: (s) => ({ city: s.city, basemap: s.basemap, flags: s.flags, theme: s.theme }),
       onRehydrateStorage: () => () => {
         useApp.setState({ hydrated: true });
       },

@@ -76,8 +76,8 @@ export default function AnalyticsPage() {
           </>
         }
       />
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-ink-700 bg-ink-900/90 px-3 py-2">
-        <span className="text-[10.5px] font-bold tracking-wider text-slate-500 uppercase">Event</span>
+      <div className="flex flex-wrap items-center gap-2 rounded border border-line bg-surface px-3 py-2">
+        <span className="text-xs font-semibold text-fg-4">Event</span>
         <Select
           label="Event"
           value={eventId ?? ""}
@@ -86,29 +86,29 @@ export default function AnalyticsPage() {
           options={[...data.events]
             .sort((a, b) => Number(!!b.featured) - Number(!!a.featured) || b.maxDepth - a.maxDepth)
             .slice(0, 40)
-            .map((e) => ({ value: e.id, label: `${e.featured ? "★ " : ""}${fmtDate(e.date)} · ${e.name} · ${e.rainfallMm} mm · ${e.maxDepth} m` }))}
+            .map((e) => ({ value: e.id, label: `${e.featured ? "★ ":""}${fmtDate(e.date)} · ${e.name} · ${e.rainfallMm} mm · ${e.maxDepth} m` }))}
         />
-        <span className="ml-3 flex items-center gap-1 text-[10.5px] font-bold tracking-wider text-slate-500 uppercase">
+        <span className="ml-3 flex items-center gap-1 text-xs font-semibold text-fg-4">
           <CalendarRange className="h-3.5 w-3.5" /> Dates
         </span>
         <Select label="From year" value={from} onChange={setFrom} options={years.map((y) => ({ value: y, label: y }))} />
-        <span className="text-xs text-slate-500">to</span>
+        <span className="text-xs text-fg-4">to</span>
         <Select label="To year" value={to} onChange={setTo} options={years.map((y) => ({ value: y, label: y }))} />
-        <span className="ml-3 text-[10.5px] font-bold tracking-wider text-slate-500 uppercase">Ward</span>
+        <span className="ml-3 text-xs font-semibold text-fg-4">Ward</span>
         <Select label="Ward" value={ward} onChange={setWard} options={[{ value: "", label: "All wards" }, ...(ds?.sectors ?? []).map((s) => ({ value: s.id, label: `${s.name} · ${s.locality}` }))]} />
-        <span className="ml-auto text-xs text-slate-400">
-          {events.length} events match · mean backtest accuracy <b className="text-white">{avgAcc}%</b>
+        <span className="ml-auto text-xs text-fg-3">
+          {events.length} events match · mean backtest accuracy <b className="text-fg">{avgAcc}%</b>
         </span>
       </div>
 
       {ev && (
         <div className="grid grid-cols-3 gap-2.5">
-          <div className="rounded-xl border border-cyan-400/25 bg-gradient-to-b from-cyan-400/[0.06] to-transparent p-4">
-            <div className="font-mono text-[10px] font-bold tracking-[0.2em] text-cyan-400 uppercase">{ev.featured ? "Featured event" : "Selected event"}</div>
-            <div className="mt-1 text-lg font-bold tracking-tight text-white uppercase">
+          <div className="rounded border border-accent/40 p-4">
+            <div className="font-mono text-xs font-semibold text-accent">{ev.featured ? "Featured event":"Selected event"}</div>
+            <div className="mt-1 text-lg font-semibold tracking-tight text-fg">
               {ds?.name} {ev.type === "Cloudburst" ? "cloudburst" : "monsoon event"}
             </div>
-            <div className="font-mono text-sm text-slate-400">{fmtDate(ev.date)}</div>
+            <div className="font-mono text-sm text-fg-3">{fmtDate(ev.date)}</div>
             <div className="mt-3 grid grid-cols-2 gap-3">
               <Big label="Rainfall" value={`${ev.rainfallMm} mm`} />
               <Big label="Max flood depth" value={`${ev.maxDepth.toFixed(2)} m`} />
@@ -117,22 +117,22 @@ export default function AnalyticsPage() {
               <Big label="Prediction accuracy" value={`${ev.accuracy}%`} accent />
               <Big label="Peak intensity" value={`${ev.peakIntensity} mm/hr`} />
             </div>
-            <p className="mt-3 text-[10.5px] text-slate-500">Accuracy = share of road segments whose risk class was predicted correctly in a synthetic backtest (illustrative).</p>
+            <p className="mt-3 text-xs text-fg-4">Accuracy = share of road segments whose risk class was predicted correctly in a synthetic backtest (illustrative).</p>
           </div>
           <Panel title="Event time series" subtitle="Rainfall (bars) · hotspot depth observed vs predicted" sim className="col-span-2" bodyClassName="p-2">
             <div className="h-60">
               {series ? (
                 <ResponsiveContainer>
                   <ComposedChart data={series.series} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-                    <CartesianGrid stroke="#1c2a48" vertical={false} />
+                    <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
                     <XAxis dataKey="t" tick={axisTick} tickFormatter={(v) => `${Math.floor(v / 60)}h`} axisLine={false} tickLine={false} />
                     <YAxis yAxisId="r" tick={axisTick} axisLine={false} tickLine={false} orientation="right" />
-                    <YAxis yAxisId="d" tick={axisTick} axisLine={false} tickLine={false} unit=" m" />
+                    <YAxis yAxisId="d" tick={axisTick} axisLine={false} tickLine={false} unit="m" />
                     <Tooltip {...chartTooltip} labelFormatter={(v) => `T+${v} min`} />
                     <RLegend wrapperStyle={{ fontSize: 10 }} />
-                    <Bar yAxisId="r" dataKey="rain" name="Rain (mm/hr)" fill="#22d3ee" fillOpacity={0.35} isAnimationActive={false} />
-                    <Line yAxisId="d" dataKey="observed" name="Observed depth" stroke="#f97316" strokeWidth={2} dot={false} isAnimationActive={false} />
-                    <Line yAxisId="d" dataKey="predicted" name="Predicted depth" stroke="#a5b4fc" strokeWidth={2} strokeDasharray="5 4" dot={false} isAnimationActive={false} />
+                    <Bar yAxisId="r" dataKey="rain" name="Rain (mm/hr)" fill="var(--chart-rain)" fillOpacity={0.35} isAnimationActive={false} />
+                    <Line yAxisId="d" dataKey="observed" name="Observed depth" stroke="var(--chart-warn)" strokeWidth={2} dot={false} isAnimationActive={false} />
+                    <Line yAxisId="d" dataKey="predicted" name="Predicted depth" stroke="var(--chart-1)" strokeWidth={2} strokeDasharray="5 4" dot={false} isAnimationActive={false} />
                   </ComposedChart>
                 </ResponsiveContainer>
               ) : (
@@ -146,74 +146,74 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-3 gap-2.5">
         <ChartPanel title="Rainfall vs flood depth" subtitle="Each dot = one event">
           <ScatterChart margin={{ top: 8, right: 10, left: -10, bottom: 4 }}>
-            <CartesianGrid stroke="#1c2a48" />
-            <XAxis type="number" dataKey="rainfallMm" name="Rainfall" unit=" mm" tick={axisTick} axisLine={false} tickLine={false} />
-            <YAxis type="number" dataKey="maxDepth" name="Max depth" unit=" m" tick={axisTick} axisLine={false} tickLine={false} />
+            <CartesianGrid stroke="var(--chart-grid)" />
+            <XAxis type="number" dataKey="rainfallMm" name="Rainfall" unit="mm" tick={axisTick} axisLine={false} tickLine={false} />
+            <YAxis type="number" dataKey="maxDepth" name="Max depth" unit="m" tick={axisTick} axisLine={false} tickLine={false} />
             <ZAxis range={[26, 26]} />
             <Tooltip {...chartTooltip} cursor={{ strokeDasharray: "3 3" }} />
             <Scatter data={events} isAnimationActive={false}>
               {events.map((e) => (
-                <Cell key={e.id} fill={e.id === eventId ? "#22d3ee" : e.type === "Cloudburst" ? "#f472b6" : e.tidal ? "#a78bfa" : "#f97316"} fillOpacity={e.id === eventId ? 1 : 0.6} />
+                <Cell key={e.id} fill={e.id === eventId ? "var(--chart-rain)" : e.type === "Cloudburst" ? "var(--danger)" : e.tidal ? "var(--chart-1)" : "var(--chart-warn)"} fillOpacity={e.id === eventId ? 1 : 0.6} />
               ))}
             </Scatter>
           </ScatterChart>
         </ChartPanel>
         <ChartPanel title="Flood duration" subtitle="Last 24 events (minutes)">
           <BarChart data={recent} margin={{ top: 8, right: 8, left: -14, bottom: 0 }}>
-            <CartesianGrid stroke="#1c2a48" vertical={false} />
+            <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
             <XAxis dataKey="date" tick={axisTick} tickFormatter={(d) => d.slice(2, 7)} axisLine={false} tickLine={false} interval={3} />
             <YAxis tick={axisTick} axisLine={false} tickLine={false} />
             <Tooltip {...chartTooltip} />
-            <Bar dataKey="floodDurationMin" name="Duration (min)" fill="#60a5fa" isAnimationActive={false} radius={[2, 2, 0, 0]} />
+            <Bar dataKey="floodDurationMin" name="Duration (min)" fill="var(--chart-1)" isAnimationActive={false} radius={[2, 2, 0, 0]} />
           </BarChart>
         </ChartPanel>
         <ChartPanel title="Maximum water depth" subtitle="Last 24 events (m)">
           <BarChart data={recent} margin={{ top: 8, right: 8, left: -14, bottom: 0 }}>
-            <CartesianGrid stroke="#1c2a48" vertical={false} />
+            <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
             <XAxis dataKey="date" tick={axisTick} tickFormatter={(d) => d.slice(2, 7)} axisLine={false} tickLine={false} interval={3} />
             <YAxis tick={axisTick} axisLine={false} tickLine={false} />
             <Tooltip {...chartTooltip} />
             <ReferenceLine y={1} stroke="#7f1d1d" strokeDasharray="3 3" />
             <Bar dataKey="maxDepth" name="Max depth (m)" isAnimationActive={false} radius={[2, 2, 0, 0]}>
               {recent.map((e) => (
-                <Cell key={e.id} fill={e.maxDepth >= 1 ? "#b91c1c" : e.maxDepth >= 0.5 ? "#dc2626" : e.maxDepth >= 0.3 ? "#f97316" : "#eab308"} />
+                <Cell key={e.id} fill={e.maxDepth >= 1 ? "#b91c1c" : e.maxDepth >= 0.5 ? "#dc2626" : e.maxDepth >= 0.3 ? "var(--chart-warn)" : "#eab308"} />
               ))}
             </Bar>
           </BarChart>
         </ChartPanel>
         <ChartPanel title="Drainage capacity" subtitle="Peak drain utilisation per event (%)">
           <LineChart data={recent} margin={{ top: 8, right: 8, left: -14, bottom: 0 }}>
-            <CartesianGrid stroke="#1c2a48" vertical={false} />
+            <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
             <XAxis dataKey="date" tick={axisTick} tickFormatter={(d) => d.slice(2, 7)} axisLine={false} tickLine={false} interval={3} />
             <YAxis tick={axisTick} axisLine={false} tickLine={false} domain={[30, 100]} />
             <Tooltip {...chartTooltip} />
-            <ReferenceLine y={90} stroke="#f97316" strokeDasharray="3 3" />
-            <Line dataKey="peakDrainUtil" name="Peak utilisation %" stroke="#38bdf8" strokeWidth={2} dot={{ r: 2 }} isAnimationActive={false} />
+            <ReferenceLine y={90} stroke="var(--chart-warn)" strokeDasharray="3 3" />
+            <Line dataKey="peakDrainUtil" name="Peak utilisation %" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 2 }} isAnimationActive={false} />
           </LineChart>
         </ChartPanel>
         <ChartPanel title="Flooded road count" subtitle="Last 24 events">
           <BarChart data={recent} margin={{ top: 8, right: 8, left: -14, bottom: 0 }}>
-            <CartesianGrid stroke="#1c2a48" vertical={false} />
+            <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
             <XAxis dataKey="date" tick={axisTick} tickFormatter={(d) => d.slice(2, 7)} axisLine={false} tickLine={false} interval={3} />
             <YAxis tick={axisTick} axisLine={false} tickLine={false} />
             <Tooltip {...chartTooltip} />
             <RLegend wrapperStyle={{ fontSize: 10 }} />
-            <Bar dataKey="floodedRoads" name="Observed" fill="#f97316" isAnimationActive={false} radius={[2, 2, 0, 0]} />
-            <Bar dataKey="predictedFloodedRoads" name="Predicted" fill="#a5b4fc" isAnimationActive={false} radius={[2, 2, 0, 0]} />
+            <Bar dataKey="floodedRoads" name="Observed" fill="var(--chart-warn)" isAnimationActive={false} radius={[2, 2, 0, 0]} />
+            <Bar dataKey="predictedFloodedRoads" name="Predicted" fill="var(--chart-1)" isAnimationActive={false} radius={[2, 2, 0, 0]} />
           </BarChart>
         </ChartPanel>
         <ChartPanel title="Model prediction accuracy" subtitle="Synthetic backtest per event (%)">
           <LineChart data={recent} margin={{ top: 8, right: 8, left: -14, bottom: 0 }}>
-            <CartesianGrid stroke="#1c2a48" vertical={false} />
+            <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
             <XAxis dataKey="date" tick={axisTick} tickFormatter={(d) => d.slice(2, 7)} axisLine={false} tickLine={false} interval={3} />
             <YAxis tick={axisTick} axisLine={false} tickLine={false} domain={[60, 100]} />
             <Tooltip {...chartTooltip} />
-            <ReferenceLine y={avgAcc} stroke="#94a3b8" strokeDasharray="3 3" label={{ value: `mean ${avgAcc}%`, fill: "#94a3b8", fontSize: 9, position: "insideTopRight" }} />
-            <Line dataKey="accuracy" name="Accuracy %" stroke="#34d399" strokeWidth={2} dot={{ r: 2 }} isAnimationActive={false} />
+            <ReferenceLine y={avgAcc} stroke="var(--chart-axis)" strokeDasharray="3 3" label={{ value: `mean ${avgAcc}%`, fill: "var(--chart-axis)", fontSize: 9, position: "insideTopRight" }} />
+            <Line dataKey="accuracy" name="Accuracy %" stroke="var(--ok)" strokeWidth={2} dot={{ r: 2 }} isAnimationActive={false} />
           </LineChart>
         </ChartPanel>
       </div>
-      <p className="px-1 pb-2 text-[10.5px] text-slate-500">{data.disclaimer} Production: IMD/AWS archives, municipal waterlogging complaints, and citizen reports.</p>
+      <p className="px-1 pb-2 text-xs text-fg-4">{data.disclaimer} Production: IMD/AWS archives, municipal waterlogging complaints, and citizen reports.</p>
     </div>
   );
 }
@@ -221,8 +221,8 @@ export default function AnalyticsPage() {
 function Big({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div>
-      <div className="text-[9.5px] font-bold tracking-wider text-slate-500 uppercase">{label}</div>
-      <div className={accent ? "font-mono text-xl font-semibold text-emerald-300" : "font-mono text-xl font-semibold text-white"}>{value}</div>
+      <div className="text-xs font-semibold text-fg-4">{label}</div>
+      <div className={accent ? "font-mono text-xl font-semibold text-ok" : "font-mono text-xl font-semibold text-fg"}>{value}</div>
     </div>
   );
 }

@@ -19,7 +19,8 @@ export const ROAD_ACTION: Record<RiskLevel, string> = {
   critical: "Close road, divert all traffic, deploy pumps and rescue team.",
 };
 
-function Spark({ res, series, clock, threshold, unit, color = "#22d3ee", max }: { res: SimResult; series: number[]; clock: number; threshold?: number; unit: string; color?: string; max?: number }) {
+function Spark({ res, series, clock, threshold, unit, color = "var(--chart-1)", max }: { res: SimResult; series: number[]; clock: number; threshold?: number; unit: string; color?: string; max?: number }) {
+  const gid = `spark-${color.replace(/[^a-z0-9]/gi, "")}`;
   const data = useMemo(() => {
     const out: { c: number; v: number }[] = [];
     for (let c = NOW_CLOCK - 60; c <= NOW_CLOCK + HORIZON_MIN; c += 5) out.push({ c, v: Math.round(sample(series, res, c) * 100) / 100 });
@@ -30,23 +31,23 @@ function Spark({ res, series, clock, threshold, unit, color = "#22d3ee", max }: 
       <ResponsiveContainer>
         <AreaChart data={data} margin={{ top: 6, right: 4, left: -24, bottom: 0 }}>
           <defs>
-            <linearGradient id={`g-${color}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={color} stopOpacity={0.45} />
+            <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity={0.25} />
               <stop offset="100%" stopColor={color} stopOpacity={0.02} />
             </linearGradient>
           </defs>
-          <CartesianGrid stroke="#1c2a48" vertical={false} />
-          <XAxis dataKey="c" type="number" domain={["dataMin", "dataMax"]} ticks={[NOW_CLOCK - 60, NOW_CLOCK, NOW_CLOCK + 60, NOW_CLOCK + 120, NOW_CLOCK + 180]} tickFormatter={clockLabel} tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fill: "#64748b", fontSize: 9 }} axisLine={false} tickLine={false} domain={[0, max ?? "auto"]} />
+          <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
+          <XAxis dataKey="c" type="number" domain={["dataMin","dataMax"]} ticks={[NOW_CLOCK - 60, NOW_CLOCK, NOW_CLOCK + 60, NOW_CLOCK + 120, NOW_CLOCK + 180]} tickFormatter={clockLabel} tick={{ fill: "var(--chart-axis)", fontSize: 10 }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fill: "var(--chart-axis)", fontSize: 10 }} axisLine={false} tickLine={false} domain={[0, max ?? "auto"]} />
           <Tooltip
-            contentStyle={{ background: "#0d172b", border: "1px solid #273a5f", borderRadius: 8, fontSize: 11 }}
+            contentStyle={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 4, fontSize: 12, color: "var(--fg)" }}
             labelFormatter={(v) => clockLabel(Number(v))}
             formatter={(v) => [`${v} ${unit}`, ""]}
           />
-          {threshold != null && <ReferenceLine y={threshold} stroke="#f97316" strokeDasharray="3 3" />}
-          <ReferenceLine x={NOW_CLOCK} stroke="#94a3b8" strokeDasharray="2 2" />
-          <ReferenceLine x={clock} stroke="#22d3ee" />
-          <Area type="monotone" dataKey="v" stroke={color} strokeWidth={2} fill={`url(#g-${color})`} isAnimationActive={false} />
+          {threshold != null && <ReferenceLine y={threshold} stroke="var(--chart-warn)" strokeDasharray="3 3" />}
+          <ReferenceLine x={NOW_CLOCK} stroke="var(--chart-axis)" strokeDasharray="2 2" />
+          <ReferenceLine x={clock} stroke="var(--accent)" />
+          <Area type="monotone" dataKey="v" stroke={color} strokeWidth={2} fill={`url(#${gid})`} isAnimationActive={false} />
           <Line dataKey="v" stroke="transparent" dot={false} />
         </AreaChart>
       </ResponsiveContainer>
@@ -76,10 +77,10 @@ export function DetailPanel({
   if (!selection || !res) return null;
   return (
     <aside
-      className={cx("slide-up absolute right-14 z-20 w-80 overflow-y-auto rounded-xl border border-ink-600 bg-ink-900/96 shadow-2xl backdrop-blur scroll-thin", className)}
+      className={cx("slide-up absolute right-14 z-20 w-80 overflow-y-auto rounded border border-line-strong bg-surface shadow-float scroll-thin", className)}
       style={{ top: offsetTop, maxHeight: `calc(100% - ${offsetTop + 104}px)` }}
     >
-      <button type="button" onClick={onClose} className="absolute top-2.5 right-2.5 rounded p-1 text-slate-400 hover:bg-ink-700 hover:text-white" aria-label="Close details">
+      <button type="button" onClick={onClose} className="absolute top-2.5 right-2.5 rounded p-1 text-fg-3 hover:bg-line hover:text-fg" aria-label="Close details">
         <X className="h-4 w-4" />
       </button>
       <div className="p-3.5">
@@ -92,12 +93,12 @@ export function DetailPanel({
 function Header({ icon, kicker, title, badge }: { icon: React.ReactNode; kicker: string; title: string; badge?: React.ReactNode }) {
   return (
     <div className="mb-3 pr-6">
-      <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] text-slate-500 uppercase">
+      <div className="flex items-center gap-1.5 text-xs font-semibold text-fg-4">
         {icon}
         {kicker}
         <SimTag />
       </div>
-      <h3 className="mt-1 text-[15px] leading-snug font-semibold text-white">{title}</h3>
+      <h3 className="mt-1 text-[15px] leading-snug font-semibold text-fg">{title}</h3>
       {badge && <div className="mt-1.5">{badge}</div>}
     </div>
   );
@@ -109,7 +110,7 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
 
   if (selection.kind === "road") {
     const ri = ds.roads.findIndex((r) => r.id === selection.id);
-    if (ri < 0) return <p className="text-xs text-slate-400">Road not found.</p>;
+    if (ri < 0) return <p className="text-xs text-fg-3">Road not found.</p>;
     const r = ds.roads[ri];
     const series = res.roads.depth[ri];
     const d = sample(series, res, clock);
@@ -124,35 +125,35 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
     const actRisk = riskOf(Math.max(d, pk.max * 0.9));
     return (
       <>
-        <Header icon={<Route className="h-3 w-3" />} kicker={`Road · ${r.id}`} title={r.label} badge={<div className="flex items-center gap-2"><RiskBadge level={risk} /><span className="text-[11px] text-slate-500">at {clockLabel(clock)}</span></div>} />
+        <Header icon={<Route className="h-3 w-3" />} kicker={`Road · ${r.id}`} title={r.label} badge={<div className="flex items-center gap-2"><RiskBadge level={risk} /><span className="text-xs text-fg-4">at {clockLabel(clock)}</span></div>} />
         <div className="grid grid-cols-2 gap-2">
           <Big label="Predicted depth" value={`${d.toFixed(2)} m`} color={RISK_TEXT[risk]} />
-          <Big label="Expected onset" value={on == null ? "—" : on <= NOW_CLOCK ? "Now" : `${Math.round(on - NOW_CLOCK)} min`} color={on == null ? undefined : "#f97316"} />
+          <Big label="Expected onset" value={on == null ? "—" : on <= NOW_CLOCK ? "Now" : `${Math.round(on - NOW_CLOCK)} min`} color={on == null ? undefined : "var(--chart-warn)"} />
           <Big label="Peak depth" value={`${pk.max.toFixed(2)} m`} sub={`at ${clockLabel(pk.clock)}`} color={RISK_TEXT[peakRisk]} />
           <Big label="P(depth > 0.3 m)" value={`${Math.round(exceedance(d, lead) * 100)}%`} />
         </div>
-        <div className="mt-3 divide-y divide-ink-700/60">
+        <div className="mt-3 divide-y divide-line">
           <KV k="Flood risk" v={<RiskBadge level={risk} size="xs" />} />
           <KV
             k="Drain node"
             v={
-              <button type="button" className="font-mono text-cyan-300 hover:underline" onClick={() => onSelect?.({ kind: "node", id: r.nodeId })}>
+              <button type="button" className="font-mono text-accent hover:underline" onClick={() => onSelect?.({ kind: "node", id: r.nodeId })}>
                 {r.nodeId}
               </button>
             }
           />
-          <KV k="Drain utilisation" v={`${Math.round(util * 100)}%`} tone={util >= 0.9 ? "#f97316" : undefined} />
+          <KV k="Drain utilisation" v={`${Math.round(util * 100)}%`} tone={util >= 0.9 ? "var(--chart-warn)" : undefined} />
           <KV k="Rainfall" v={`${Math.round(rain)} mm/hr`} />
           <KV k="Class · length" v={`${r.cls}${(r as { structure?: string }).structure ? ` (${(r as { structure?: string }).structure})` : ""} · ${r.lengthM} m`} />
           <KV k="Relative lowness" v={`${Math.round(r.relLow * 100)}%`} />
         </div>
         <div className="mt-3">
-          <div className="mb-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase">Depth forecast (m)</div>
+          <div className="mb-1 text-xs font-semibold text-fg-4">Depth forecast (m)</div>
           <Spark res={res} series={series} clock={clock} threshold={UNSAFE_DEPTH} unit="m" color={RISK_COLOR[peakRisk === "safe" ? "low" : peakRisk]} />
         </div>
-        <div className="mt-3 rounded-lg border p-2.5" style={{ borderColor: RISK_COLOR[actRisk] + "66", background: RISK_COLOR[actRisk] + "14" }}>
-          <div className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Recommended action</div>
-          <p className="mt-0.5 text-[13px] font-medium text-white">{ROAD_ACTION[actRisk]}</p>
+        <div className="mt-3 rounded border p-2.5" style={{ borderColor: RISK_COLOR[actRisk] + "66", background: RISK_COLOR[actRisk] + "14" }}>
+          <div className="text-xs font-semibold text-fg-3">Recommended action</div>
+          <p className="mt-0.5 text-[13px] font-medium text-fg">{ROAD_ACTION[actRisk]}</p>
         </div>
       </>
     );
@@ -160,7 +161,7 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
 
   if (selection.kind === "node") {
     const ni = ds.drainNodes.findIndex((n) => n.id === selection.id);
-    if (ni < 0) return <p className="text-xs text-slate-400">Node not found.</p>;
+    if (ni < 0) return <p className="text-xs text-fg-3">Node not found.</p>;
     const n = ds.drainNodes[ni];
     const util = sample(res.nodes.util[ni], res, clock);
     const pond = sample(res.nodes.pond[ni], res, clock);
@@ -178,8 +179,8 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
           title={n.id}
           badge={
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase" style={{ color: NODE_STATUS_COLOR[st], borderColor: NODE_STATUS_COLOR[st] + "66" }}>
-                Surcharge: {st === "surcharged" ? "ACTIVE" : st === "warning" ? "WARNING" : st === "watch" ? "WATCH" : "NONE"}
+              <span className="rounded-md border px-2 py-0.5 text-xs font-semibold" style={{ color: NODE_STATUS_COLOR[st], borderColor: NODE_STATUS_COLOR[st] + "66" }}>
+                Surcharge: {st === "surcharged" ? "ACTIVE" : st === "warning" ? "WARNING" : st === "watch" ? "WATCH":"NONE"}
               </span>
               <RiskBadge level={risk} size="xs" />
             </div>
@@ -187,27 +188,27 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
         />
         <div className="grid grid-cols-2 gap-2">
           <Big label="Water level" value={`${sample(res.nodes.level[ni], res, clock).toFixed(2)} m`} sub={`of ${n.maxDepth.toFixed(1)} m chamber`} />
-          <Big label="Capacity used" value={`${Math.round(util * 100)}%`} color={util >= 0.9 ? "#f97316" : "#38bdf8"} />
+          <Big label="Capacity used" value={`${Math.round(util * 100)}%`} color={util >= 0.9 ? "var(--chart-warn)" : "var(--chart-1)"} />
           <Big label="Flow" value={`${sample(res.nodes.flow[ni], res, clock).toFixed(1)} m³/s`} sub={`design ${n.capacity.toFixed(1)}`} />
           <Big label="Upstream rain" value={`${Math.round(field.at(n.coord[0], n.coord[1], clock))} mm/hr`} />
         </div>
-        <Meter value={util} className="mt-3" color={util >= 1 ? "#dc2626" : util >= 0.9 ? "#f97316" : util >= 0.75 ? "#eab308" : "#38bdf8"} />
-        <div className="mt-3 divide-y divide-ink-700/60">
+        <Meter value={util} className="mt-3" color={util >= 1 ? "#dc2626" : util >= 0.9 ? "var(--chart-warn)" : util >= 0.75 ? "#eab308" : "var(--chart-1)"} />
+        <div className="mt-3 divide-y divide-line">
           <KV k="Status" v={NODE_STATUS_LABEL[st]} tone={NODE_STATUS_COLOR[st]} />
           <KV
             k="Downstream"
             v={
               n.downstream ? (
                 <span>
-                  <button type="button" className="font-mono text-cyan-300 hover:underline" onClick={() => onSelect?.({ kind: "node", id: n.downstream! })}>
+                  <button type="button" className="font-mono text-accent hover:underline" onClick={() => onSelect?.({ kind: "node", id: n.downstream! })}>
                     {n.downstream}
                   </button>
-                  {bw && <span className="ml-1.5 text-amber-300">· backwater detected</span>}
+                  {bw && <span className="ml-1.5 text-warn">· backwater detected</span>}
                 </span>
               ) : (
                 <span>
                   Outfall — {n.outfallName}
-                  {bw && <span className="ml-1 text-amber-300">(backwater)</span>}
+                  {bw && <span className="ml-1 text-warn">(backwater)</span>}
                 </span>
               )
             }
@@ -215,13 +216,13 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
           <KV k="Upstream nodes" v={n.upstream.length} />
           <KV k="Surcharge forecast" v={surchargeOn == null ? "Not expected" : surchargeOn <= NOW_CLOCK ? "Active now" : `in ${Math.round(surchargeOn - NOW_CLOCK)} min (${clockLabel(surchargeOn)})`} />
           <KV k="Surface ponding" v={`${pond.toFixed(2)} m`} />
-          <KV k="Blockage (silt/debris)" v={`${Math.round(n.blockage * 100)}%`} tone={n.blockage >= 0.2 ? "#f59e0b" : undefined} />
+          <KV k="Blockage (silt/debris)" v={`${Math.round(n.blockage * 100)}%`} tone={n.blockage >= 0.2 ? "var(--warn)" : undefined} />
           <KV k="Catchment · upstream" v={`${n.catchmentHa.toFixed(0)} ha · ${n.upstreamHa.toFixed(0)} ha`} />
           <KV k="Connected roads" v={`${n.roadIds.length} (highlighted)`} />
         </div>
         <div className="mt-3">
-          <div className="mb-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase">Capacity used (%)</div>
-          <Spark res={res} series={res.nodes.util[ni].map((v) => v * 100)} clock={clock} threshold={90} unit="%" color="#38bdf8" max={100} />
+          <div className="mb-1 text-xs font-semibold text-fg-4">Capacity used (%)</div>
+          <Spark res={res} series={res.nodes.util[ni].map((v) => v * 100)} clock={clock} threshold={90} unit="%" color="var(--chart-1)" max={100} />
         </div>
       </>
     );
@@ -245,23 +246,23 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
         <Header icon={<MapPin className="h-3 w-3" />} kicker="Ward / sector" title={`${s.name} · ${s.locality}`} badge={<RiskBadge level={imp.risk} />} />
         <div className="grid grid-cols-2 gap-2">
           <Big label="Population" value={s.population.toLocaleString("en-IN")} />
-          <Big label="Affected now" value={imp.popAtRisk.toLocaleString("en-IN")} color={imp.popAtRisk ? "#f97316" : undefined} sub={`peak ${peakImp.popAtRisk.toLocaleString("en-IN")}`} />
+          <Big label="Affected now" value={imp.popAtRisk.toLocaleString("en-IN")} color={imp.popAtRisk ? "var(--chart-warn)" : undefined} sub={`peak ${peakImp.popAtRisk.toLocaleString("en-IN")}`} />
           <Big label="Max road depth" value={`${imp.maxDepth.toFixed(2)} m`} color={RISK_TEXT[riskOf(imp.maxDepth)]} />
           <Big label="Unsafe roads" value={String(imp.roadsUnsafe)} />
         </div>
-        <div className="mt-3 divide-y divide-ink-700/60">
+        <div className="mt-3 divide-y divide-line">
           <KV k="Area" v={`${s.areaKm2.toFixed(2)} km²`} />
           <KV k="Impervious surface" v={`${Math.round(s.impervious * 100)}%`} />
           <KV k="Mean elevation" v={`${s.meanElev.toFixed(1)} m`} />
           <KV k="Flooded area" v={`${imp.floodedAreaPct.toFixed(1)}%`} />
         </div>
         <div className="mt-3">
-          <div className="mb-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase">Infrastructure in sector</div>
+          <div className="mb-1 text-xs font-semibold text-fg-4">Infrastructure in sector</div>
           {infra.length ? (
             <ul className="space-y-1">
               {infra.map((p) => (
                 <li key={p.id}>
-                  <button type="button" onClick={() => onSelect?.({ kind: "poi", id: p.id })} className="flex w-full items-center gap-2 rounded px-1.5 py-1 text-left text-xs text-slate-300 hover:bg-ink-800">
+                  <button type="button" onClick={() => onSelect?.({ kind: "poi", id: p.id })} className="flex w-full items-center gap-2 rounded px-1.5 py-1 text-left text-xs text-fg-2 hover:bg-surface-3">
                     <Tag tone={p.kind === "hospital" ? "red" : p.kind === "shelter" ? "green" : p.kind === "fire" ? "amber" : "blue"}>{p.kind}</Tag>
                     <span className="truncate">{p.name}</span>
                   </button>
@@ -269,10 +270,10 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
               ))}
             </ul>
           ) : (
-            <p className="text-xs text-slate-500">No mapped facilities.</p>
+            <p className="text-xs text-fg-4">No mapped facilities.</p>
           )}
         </div>
-        <Link href="/evacuation" className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-cyan-300 hover:underline">
+        <Link href="/evacuation" className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline">
           Plan evacuation for {s.name} →
         </Link>
       </>
@@ -298,12 +299,12 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
       <>
         <Header icon={<CloudRain className="h-3 w-3" />} kicker="Rainfall cell (radar pixel)" title={`${lat.toFixed(4)}°N, ${lon.toFixed(4)}°E`} />
         <div className="grid grid-cols-2 gap-2">
-          <Big label="Now" value={`${Math.round(now)} mm/hr`} color="#22d3ee" />
-          <Big label={`At ${clockLabel(clock)}`} value={`${Math.round(at)} mm/hr`} color="#22d3ee" />
+          <Big label="Now" value={`${Math.round(now)} mm/hr`} color="var(--chart-rain)" />
+          <Big label={`At ${clockLabel(clock)}`} value={`${Math.round(at)} mm/hr`} color="var(--chart-rain)" />
           <Big label="Peak (next 3 h)" value={`${Math.round(mx)} mm/hr`} sub={`at ${clockLabel(mxc)}`} />
           <Big label="Last 60 min" value={`${Math.round(acc)} mm`} />
         </div>
-        <p className="mt-3 text-[11px] leading-relaxed text-slate-500">Simulated radar/AWS blend. In production: IMD Doppler reflectivity converted with Z–R and bias-corrected against AWS gauges.</p>
+        <p className="mt-3 text-xs leading-relaxed text-fg-4">Simulated radar/AWS blend. In production: IMD Doppler reflectivity converted with Z–R and bias-corrected against AWS gauges.</p>
       </>
     );
   }
@@ -324,20 +325,20 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
           icon={p.kind === "hospital" ? <Hospital className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
           kicker={`${kindLabel} · ${p.id}`}
           title={p.name}
-          badge={<Tag tone={atRisk ? "red" : "green"}>{p.kind === "shelter" ? (atRisk ? "Access flooding" : "Available") : atRisk ? "Access at risk" : "Operational"}</Tag>}
+          badge={<Tag tone={atRisk ? "red" : "green"}>{p.kind === "shelter" ? (atRisk ? "Access flooding":"Available") : atRisk ? "Access at risk":"Operational"}</Tag>}
         />
-        <div className="divide-y divide-ink-700/60">
+        <div className="divide-y divide-line">
           <KV k="Sector" v={ds.sectors.find((s) => s.id === p.sectorId)?.name} />
           <KV k="Ground elevation" v={`${p.elev.toFixed(1)} m`} />
           {p.beds && <KV k="Beds (indicative)" v={p.beds} />}
           {p.capacity && <KV k="Shelter capacity" v={`${p.capacity} persons`} />}
-          <KV k="Nearest drain node" v={<button type="button" className="font-mono text-cyan-300 hover:underline" onClick={() => onSelect?.({ kind: "node", id: p.nodeId })}>{p.nodeId}</button>} />
+          <KV k="Nearest drain node" v={<button type="button" className="font-mono text-accent hover:underline" onClick={() => onSelect?.({ kind: "node", id: p.nodeId })}>{p.nodeId}</button>} />
         </div>
         <div className="mt-3">
-          <div className="mb-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase">Access roads at {clockLabel(clock)}</div>
+          <div className="mb-1 text-xs font-semibold text-fg-4">Access roads at {clockLabel(clock)}</div>
           {access.map((a) => (
-            <button key={a.id} type="button" onClick={() => onSelect?.({ kind: "road", id: a.id })} className="flex w-full items-center justify-between gap-2 rounded px-1.5 py-1 text-left text-xs hover:bg-ink-800">
-              <span className="truncate text-slate-300">{a.label}</span>
+            <button key={a.id} type="button" onClick={() => onSelect?.({ kind: "road", id: a.id })} className="flex w-full items-center justify-between gap-2 rounded px-1.5 py-1 text-left text-xs hover:bg-surface-3">
+              <span className="truncate text-fg-2">{a.label}</span>
               <span className="font-mono tnum" style={{ color: RISK_TEXT[riskOf(a.d)] }}>
                 {a.d.toFixed(2)} m
               </span>
@@ -345,7 +346,7 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
           ))}
         </div>
         {p.kind !== "shelter" && (
-          <Link href={`/routing?origin=${p.id}`} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-cyan-300 hover:underline">
+          <Link href={`/routing?origin=${p.id}`} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline">
             <Navigation className="h-3 w-3" /> Plan safe route from here →
           </Link>
         )}
@@ -364,12 +365,12 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
     return (
       <>
         <Header icon={<MapPin className="h-3 w-3" />} kicker={`Critical intersection · ${j.id}`} title={j.name} badge={<RiskBadge level={riskOf(mx)} />} />
-        <div className="divide-y divide-ink-700/60">
+        <div className="divide-y divide-line">
           {rows.map((r) => (
             <KV key={r.id} k={r.label} v={<span style={{ color: RISK_TEXT[riskOf(r.d)] }}>{r.d.toFixed(2)} m</span>} />
           ))}
         </div>
-        <div className="mt-3 rounded-lg border border-ink-600 bg-ink-850 p-2.5 text-[13px] text-white">{ROAD_ACTION[riskOf(mx)]}</div>
+        <div className="mt-3 rounded border border-line-strong bg-surface-2 p-2.5 text-[13px] text-fg">{ROAD_ACTION[riskOf(mx)]}</div>
       </>
     );
   }
@@ -380,9 +381,9 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
     return (
       <>
         <Header icon={<Siren className="h-3 w-3" />} kicker={`Incident · ${inc.id}`} title={inc.name} />
-        <p className="text-xs text-slate-300">{inc.description}</p>
+        <p className="text-xs text-fg-2">{inc.description}</p>
         <KV k="Sector" v={ds.sectors.find((s) => s.id === inc.sectorId)?.name} />
-        <Link href={`/routing?incident=${inc.id}`} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-cyan-300 hover:underline">
+        <Link href={`/routing?incident=${inc.id}`} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline">
           <Navigation className="h-3 w-3" /> Plan shortest safe route →
         </Link>
       </>
@@ -393,12 +394,12 @@ function Body({ ds, res, clock, selection, onSelect }: { ds: CityDataset; res: S
 
 function Big({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) {
   return (
-    <div className="rounded-lg border border-ink-700 bg-ink-850 px-2.5 py-2">
-      <div className="text-[9.5px] font-bold tracking-wider text-slate-500 uppercase">{label}</div>
-      <div className="mt-0.5 font-mono text-base font-semibold text-white tnum" style={color ? { color } : undefined}>
+    <div className="rounded border border-line bg-surface-2 px-2.5 py-2">
+      <div className="text-xs font-semibold text-fg-4">{label}</div>
+      <div className="mt-0.5 font-mono text-base font-semibold text-fg tnum" style={color ? { color } : undefined}>
         {value}
       </div>
-      {sub && <div className="text-[10px] text-slate-500">{sub}</div>}
+      {sub && <div className="text-xs text-fg-4">{sub}</div>}
     </div>
   );
 }

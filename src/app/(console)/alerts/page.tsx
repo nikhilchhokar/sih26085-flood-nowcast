@@ -40,10 +40,10 @@ export default function AlertsPage() {
         right={<SimTag label="Simulated alerts" />}
       />
       <div className="grid grid-cols-5 gap-2.5">
-        <Stat value={count("critical")} label="Critical" tone="#f87171" sub="Depth > 1.0 m forecast" />
-        <Stat value={count("high")} label="High" tone="#fb923c" sub="Road unsafe / drain ≥ 90%" />
-        <Stat value={count("medium")} label="Medium" tone="#fbbf24" sub="Advisories" />
-        <Stat value={open} label="Unhandled" sub="Awaiting operator" tone={open ? "#e2e8f0" : "#4ade80"} />
+        <Stat value={count("critical")} label="Critical" tone="var(--danger)" sub="Depth > 1.0 m forecast" />
+        <Stat value={count("high")} label="High" tone="var(--chart-warn)" sub="Road unsafe / drain ≥ 90%" />
+        <Stat value={count("medium")} label="Medium" tone="var(--warn)" sub="Advisories" />
+        <Stat value={open} label="Unhandled" sub="Awaiting operator" tone={open ? "var(--fg)" : "var(--ok)"} />
         <Stat value={incidents.length + (ds?.incidents.length ?? 0)} label="Incidents" sub={`${incidents.length} created · ${ds?.incidents.length ?? 0} field reports`} />
       </div>
       <div className="flex min-h-0 flex-1 gap-2.5">
@@ -85,25 +85,25 @@ export default function AlertsPage() {
         <div className="scroll-thin flex w-[400px] shrink-0 flex-col gap-2.5 overflow-y-auto">
           <Panel title="Incidents" icon={<ClipboardList className="h-3.5 w-3.5" />} className="shrink-0" bodyClassName="p-0">
             {incidents.map((i) => (
-              <div key={i.id} className="border-t border-ink-700/60 px-3 py-2 first:border-t-0">
+              <div key={i.id} className="border-t border-line px-3 py-2 first:border-t-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs text-violet-300">{i.id}</span>
+                  <span className="font-mono text-xs text-accent">{i.id}</span>
                   <Tag tone={i.status === "open" ? "violet" : i.status === "team-dispatched" ? "green" : "slate"}>{i.status}</Tag>
-                  <span className="ml-auto font-mono text-[10px] text-slate-500">from {i.alertId}</span>
+                  <span className="ml-auto font-mono text-xs text-fg-4">from {i.alertId}</span>
                 </div>
-                <p className="mt-0.5 text-xs text-slate-200">{i.title}</p>
-                <p className="text-[11px] text-slate-500">{i.location}</p>
+                <p className="mt-0.5 text-xs text-fg">{i.title}</p>
+                <p className="text-xs text-fg-4">{i.location}</p>
               </div>
             ))}
             {ds?.incidents.map((i) => (
-              <div key={i.id} className="border-t border-ink-700/60 px-3 py-2 first:border-t-0">
+              <div key={i.id} className="border-t border-line px-3 py-2 first:border-t-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs text-red-300">{i.id}</span>
+                  <span className="font-mono text-xs text-danger">{i.id}</span>
                   <Tag tone="red">Field report</Tag>
                   <SimTag />
                 </div>
-                <p className="mt-0.5 text-xs text-slate-200">{i.name}</p>
-                <p className="text-[11px] text-slate-500">{i.description}</p>
+                <p className="mt-0.5 text-xs text-fg">{i.name}</p>
+                <p className="text-xs text-fg-4">{i.description}</p>
               </div>
             ))}
             {!incidents.length && !ds?.incidents.length && <Empty>No incidents.</Empty>}
@@ -116,15 +116,15 @@ export default function AlertsPage() {
               <Threshold sev="medium" text="Drain node forecast ≥ 90% capacity" />
               <Threshold sev="medium" text="Rainfall rising > 15 mm/hr in 30 min over a sector" />
             </div>
-            <p className="mt-2 text-[10.5px] text-slate-500">Prototype thresholds. Production: calibrated per ward against false-alarm rate (proposal slide 4).</p>
+            <p className="mt-2 text-xs text-fg-4">Prototype thresholds. Production: calibrated per ward against false-alarm rate (proposal slide 4).</p>
           </Panel>
           <Panel title="Activity log" icon={<ScrollText className="h-3.5 w-3.5" />} className="shrink-0" bodyClassName="p-0">
             {log.length ? (
               <div className="max-h-72 overflow-y-auto">
                 {log.map((l) => (
-                  <div key={l.id} className="flex gap-2 border-t border-ink-700/60 px-3 py-1.5 text-[11.5px] first:border-t-0">
-                    <span className="shrink-0 font-mono text-[10px] text-slate-500">{new Date(l.at).toLocaleTimeString("en-IN", { hour12: false })}</span>
-                    <span className={cx(l.kind === "alert" ? "text-red-300" : l.kind === "warn" ? "text-amber-300" : l.kind === "action" ? "text-emerald-300" : "text-slate-300")}>{l.text}</span>
+                  <div key={l.id} className="flex gap-2 border-t border-line px-3 py-1.5 text-xs first:border-t-0">
+                    <span className="shrink-0 font-mono text-xs text-fg-4">{new Date(l.at).toLocaleTimeString("en-IN", { hour12: false })}</span>
+                    <span className={cx(l.kind === "alert" ? "text-danger" : l.kind === "warn" ? "text-warn" : l.kind === "action" ? "text-ok" : "text-fg-2")}>{l.text}</span>
                   </div>
                 ))}
               </div>
@@ -147,7 +147,7 @@ function Threshold({ sev, text }: { sev: Severity; text: string }) {
   return (
     <div className="flex items-start gap-2">
       <SeverityBadge severity={sev} className="w-20 shrink-0 justify-center" />
-      <span className="text-slate-300">{text}</span>
+      <span className="text-fg-2">{text}</span>
     </div>
   );
 }

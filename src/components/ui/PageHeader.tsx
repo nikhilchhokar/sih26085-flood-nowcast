@@ -3,21 +3,21 @@ import { cx } from "./primitives";
 
 export function PageHeader({ title, subtitle, right, kicker, className }: { title: string; subtitle?: ReactNode; right?: ReactNode; kicker?: string; className?: string }) {
   return (
-    <div className={cx("flex flex-wrap items-end justify-between gap-3", className)}>
+    <div className={cx("flex flex-wrap items-end justify-between gap-3 pb-0.5", className)}>
       <div className="min-w-0">
-        {kicker && <div className="font-mono text-[10px] font-bold tracking-[0.18em] text-cyan-400/80 uppercase">{kicker}</div>}
-        <h1 className="text-lg font-semibold tracking-tight text-white">{title}</h1>
-        {subtitle && <p className="mt-0.5 max-w-3xl text-[12.5px] text-slate-400">{subtitle}</p>}
+        {kicker && <div className="text-xs text-fg-4">{kicker}</div>}
+        <h1 className="text-xl font-semibold text-fg">{title}</h1>
+        {subtitle && <p className="mt-0.5 max-w-3xl text-[13px] text-fg-3">{subtitle}</p>}
       </div>
       {right && <div className="flex flex-wrap items-center gap-2">{right}</div>}
     </div>
   );
 }
 
-/** Standard dark tooltip styling for Recharts. */
+/** Recharts styling bound to theme variables (SVG attributes accept CSS vars). */
 export const chartTooltip = {
-  contentStyle: { background: "#0d172b", border: "1px solid #273a5f", borderRadius: 8, fontSize: 11, color: "#e2e8f0" },
-  labelStyle: { color: "#94a3b8" },
-  itemStyle: { color: "#e2e8f0" },
+  contentStyle: { background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 4, fontSize: 12, color: "var(--fg)", boxShadow: "var(--shadow-float)" },
+  labelStyle: { color: "var(--fg-3)", marginBottom: 2 },
+  itemStyle: { color: "var(--fg)", padding: 0 },
 };
-export const axisTick = { fill: "#64748b", fontSize: 10 };
+export const axisTick = { fill: "var(--chart-axis)", fontSize: 11 };
