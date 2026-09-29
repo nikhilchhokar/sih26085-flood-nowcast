@@ -1,0 +1,41 @@
+{
+  "name": "sih26085-flood-nowcast",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SIH26085 - Urban Flood Nowcasting System (Drainage and Rainfall Coupling) - Code Sutra prototype",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "data:fetch": "tsx scripts/fetch-sources.ts",
+    "data:build": "tsx scripts/build-dataset.ts"
+  },
+  "dependencies": {
+    "@deck.gl/core": "~9.4.0",
+    "@deck.gl/extensions": "~9.4.0",
+    "@deck.gl/geo-layers": "~9.4.0",
+    "@deck.gl/layers": "~9.4.0",
+    "@deck.gl/mapbox": "~9.4.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.48.0",
+    "maplibre-gl": "^5.24.0",
+    "next": "15.5.26",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "recharts": "^3.10.1",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/d3-delaunay": "^6.0.4",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "d3-delaunay": "^6.0.4",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.19.0",
+    "typescript": "^5.9.0"
+  }
+}
