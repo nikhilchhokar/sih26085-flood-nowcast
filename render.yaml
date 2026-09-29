@@ -1,0 +1,19 @@
+# Render Blueprint — SIH26085 Urban Flood Nowcasting System
+# Deploy: Render Dashboard → New → Blueprint → select this repo
+services:
+  - type: web
+    name: sih26085-flood-nowcast
+    runtime: node
+    plan: free # change to 'starter' in the dashboard if the build runs out of memory
+    region: singapore # closest to India; oregon/frankfurt also available
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      # Optional: point the UI at a real FastAPI backend instead of the mock API
+      # - key: NEXT_PUBLIC_API_BASE_URL
+      #   sync: false
